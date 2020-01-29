@@ -2,7 +2,6 @@ package zanarkandwrapperjson
 
 import (
 	"bytes"
-	"encoding/binary"
 	"fmt"
 	"log"
 	"net/http"
@@ -11,96 +10,73 @@ import (
 	"github.com/ayyaruq/zanarkand"
 )
 
-func parsePacket(frame *zanarkand.Frame, region string, port uint16) {
-	ipcPacket := new(IpcPacket)
-	ipcPacket.Metadata = frame
-	ipcPacket.PacketSize = binary.LittleEndian.Uint32(frame.Body[PacketSize : PacketSize+4])
-	ipcPacket.SourceActor = binary.LittleEndian.Uint32(frame.Body[SourceActor : SourceActor+4])
-	ipcPacket.TargetActor = binary.LittleEndian.Uint32(frame.Body[TargetActor : TargetActor+4])
-	ipcPacket.SegmentType = binary.LittleEndian.Uint16(frame.Body[SegmentType : SegmentType+2])
-	ipcPacket.Opcode = binary.LittleEndian.Uint16(frame.Body[IpcType : IpcType+2])
-	ipcPacket.ServerID = binary.LittleEndian.Uint16(frame.Body[ServerID : ServerID+2])
-	ipcPacket.Timestamp = binary.LittleEndian.Uint32(frame.Body[Timestamp : Timestamp+2])
-
+func parseMessage(message *zanarkand.GameEventMessage, region string, port uint16) {
 	var ipcType string
 	var ok bool
 
-	switch frame.Connection {
-	case 0:
-		ipcType, ok = ServerLobbyIpcType[ipcPacket.Opcode]
-		if !ok {
-			ipcType, ok = ClientLobbyIpcType[ipcPacket.Opcode]
-		}
-		if !ok {
-			ipcType = "unknown"
-		}
-		break
-	case 1:
-		ipcType, ok = ServerZoneIpcType[ipcPacket.Opcode]
-		if !ok {
-			ipcType, ok = ClientZoneIpcType[ipcPacket.Opcode]
-		}
-		if !ok {
-			ipcType = "unknown"
-		}
-		break
-	case 2:
-		ipcType, ok = ServerChatIpcType[ipcPacket.Opcode]
-		if !ok {
-			ipcType, ok = ClientChatIpcType[ipcPacket.Opcode]
-		}
-		if !ok {
-			ipcType = "unknown"
-		}
-		break
+	ipcType, ok = ServerLobbyIpcType[message.Opcode]
+	if !ok {
+		ipcType, ok = ClientLobbyIpcType[message.Opcode]
+	}
+	if !ok {
+		ipcType, ok = ServerZoneIpcType[message.Opcode]
+	}
+	if !ok {
+		ipcType, ok = ClientZoneIpcType[message.Opcode]
+	}
+	if !ok {
+		ipcType, ok = ServerChatIpcType[message.Opcode]
+	}
+	if !ok {
+		ipcType, ok = ClientChatIpcType[message.Opcode]
+	}
+	if !ok {
+		ipcType = "unknown"
 	}
 
 	ipcType = strings.ToLower(ipcType[0:1]) + ipcType[1:]
 
+	var actorControlCategory string
+	var clientTriggerCategory string
 	if ipcType[0:12] == "actorControl" {
 		// ActorControlCategory
 	} else if ipcType[0:13] == "clientTrigger" {
 		// ClientTriggerCategory
 	}
 
-	ipcPacket.Type = ipcType
-
-	serializePacket(ipcPacket, region, port)
+	serializePacket(message, ipcType, actorControlCategory, clientTriggerCategory, region, port)
 }
 
-func serializePacket(packet *IpcPacket, region string, port uint16) {
+func serializePacket(message *zanarkand.GameEventMessage, ipcType string, actorControlCategory string, clientTriggerCategory string, region string, port uint16) {
 	// Use strings.Builder instead
 	json := "{"
-	json += "\"type\":\"" + packet.Type + "\","
-	json += "\"opcode\":\"" + fmt.Sprint(packet.Opcode) + "\","
+	json += "\"type\":\"" + ipcType + "\","
+	json += "\"opcode\":\"" + fmt.Sprint(message.Opcode) + "\","
 	json += "\"region\":\"" + region + "\","
-	json += "\"connection\":null,"                                                   // Initialized field, but undefined and unnecessary
-	json += "\"connectionType\":\"" + fmt.Sprint(packet.Metadata.Connection) + "\"," // New and important
-	json += "\"epoch\":\"" + fmt.Sprint(packet.Metadata.Timestamp.Unix()) + "\","
-	json += "\"packetSize\":\"" + fmt.Sprint(packet.PacketSize) + "\","
-	json += "\"segmentType\":\"" + fmt.Sprint(packet.SegmentType) + "\","
-	if packet.SegmentType == 3 {
-		json += "\"sourceActorSessionID\":\"" + fmt.Sprint(packet.SourceActor) + "\","
-		json += "\"targetActorSessionID\":\"" + fmt.Sprint(packet.TargetActor) + "\","
-		json += "\"serverID\":\"" + fmt.Sprint(packet.ServerID) + "\","
-		json += "\"timestamp\":\"" + fmt.Sprint(packet.Timestamp) + "\","
+	json += "\"packetSize\":\"" + fmt.Sprint(message.Length) + "\","
+	json += "\"segmentType\":\"" + fmt.Sprint(message.Segment) + "\","
+	if message.Segment == 3 {
+		json += "\"sourceActorSessionID\":\"" + fmt.Sprint(message.SourceActor) + "\","
+		json += "\"targetActorSessionID\":\"" + fmt.Sprint(message.TargetActor) + "\","
+		json += "\"serverID\":\"" + fmt.Sprint(message.ServerID) + "\","
+		json += "\"timestamp\":\"" + fmt.Sprint(message.Timestamp) + "\","
 
 		// To cut down on data transfer a bit, we trim this. The useful data before this is parsed by now anyways.
-		packet.Metadata.Body = packet.Metadata.Body[IpcData:]
+		message.Body = message.Body[0x20:]
 
-		if packet.ActorControlCategory != "" {
+		if actorControlCategory != "" {
 			json += "\"superType\":\"actorControl\","
-			json += "\"subType\":\"" + packet.ActorControlCategory + "\","
-		} else if packet.ClientTriggerCategory != "" {
+			json += "\"subType\":\"" + actorControlCategory + "\","
+		} else if clientTriggerCategory != "" {
 			json += "\"superType\":\"clientTrigger\","
-			json += "\"subType\":\"" + packet.ClientTriggerCategory + "\","
+			json += "\"subType\":\"" + clientTriggerCategory + "\","
 		}
 	}
 	json += "\"data\":["
-	for i := 0; i < len(packet.Metadata.Body)-1; i++ {
-		json += fmt.Sprint(packet.Metadata.Body[i]) + ","
+	for i := 0; i < len(message.Body)-1; i++ {
+		json += fmt.Sprint(message.Body[i]) + ","
 	}
-	json += fmt.Sprint(packet.Metadata.Body[len(packet.Metadata.Body)])
+	json += fmt.Sprint(message.Body[len(message.Body)])
 	json += "]}"
 
 	var buf bytes.Buffer

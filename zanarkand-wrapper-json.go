@@ -62,13 +62,15 @@ func main() {
 	if err1 != nil {
 		log.Fatal(err1)
 	}
+	subscriber := zanarkand.NewGameEventSubscriber()
 
-	// Run goroutines
+	// Run loops
 	var input string
 	var lastErr error
 	go inputLoop(&input, &lastErr)
-	go inputProcssingLoop(&input, &lastErr, sniffer)
-	go parseLoop(sniffer, region, port)
+	go inputProcssingLoop(&input, &lastErr, sniffer, subscriber)
+
+	parseLoop(subscriber, region, port)
 }
 
 // Take input instantly
@@ -76,12 +78,12 @@ func inputLoop(input *string, lastErr *error) {
 	stdin := bufio.NewReader(os.Stdin)
 
 	for {
-		*input, *lastErr = stdin.ReadString('\n') // In .NET this blocks the thread on its own, I imagine it's the same here
+		*input, *lastErr = stdin.ReadString('\n')
 	}
 }
 
 // Process inputs every 200ms
-func inputProcssingLoop(input *string, lastErr *error, sniffer *zanarkand.Sniffer) {
+func inputProcssingLoop(input *string, lastErr *error, sniffer *zanarkand.Sniffer, subscriber *zanarkand.GameEventSubscriber) {
 	for *input != "kill" {
 		if *lastErr != nil {
 			log.Println(*lastErr)
@@ -89,7 +91,7 @@ func inputProcssingLoop(input *string, lastErr *error, sniffer *zanarkand.Sniffe
 		}
 
 		if *input == "start" && !sniffer.Active() {
-			go sniffer.Start()
+			go subscriber.Subscribe(sniffer)
 		} else if *input == "stop" && sniffer.Active() {
 			sniffer.Stop()
 		}
@@ -105,15 +107,12 @@ func inputProcssingLoop(input *string, lastErr *error, sniffer *zanarkand.Sniffe
 	os.Exit(0)
 }
 
-func parseLoop(sniffer *zanarkand.Sniffer, region string, port uint16) {
+func parseLoop(subscriber *zanarkand.GameEventSubscriber, region string, port uint16) {
 	for {
-		frame, err := sniffer.NextFrame()
-		if err != nil {
-			log.Println(err)
-		}
+		message := <-subscriber.Events
 
-		// Push the frame to the parsing sequence
-		parsePacket(frame, region, port)
+		// Push the message to the parsing sequence
+		parseMessage(message, region, port)
 	}
 }
 
