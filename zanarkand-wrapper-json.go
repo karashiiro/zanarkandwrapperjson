@@ -3,24 +3,34 @@ package zanarkandwrapperjson
 import (
 	"bufio"
 	"log"
-	"net"
 	"os"
 	"sort"
 	"strconv"
 	"time"
 
 	"github.com/ayyaruq/zanarkand"
-	"github.com/ayyaruq/zanarkand/devices"
-	"sapphire"
+	devices "github.com/ayyaruq/zanarkand/devices"
+
+	"github.com/karashiiro/ZanarkandWrapperJSON/sapphire"
 )
 
-// I'm not reversing these manually.
-var ServerLobbyIpcType := reverseMap(sapphire.ServerLobbyIpcType)
-var ClientLobbyIpcType := reverseMap(sapphire.ClientLobbyIpcType)
-var ServerZoneIpcType := reverseMap(sapphire.ServerZoneIpcType)
-var ClientZoneIpcType := reverseMap(sapphire.ClientZoneIpcType)
-var ServerChatIpcType := reverseMap(sapphire.ServerChatIpcType)
-var ClientChatIpcType := reverseMap(sapphire.ClientChatIpcType)
+// ServerLobbyIpcType - Value-first version of sapphire.ServerLobbyIpcType
+var ServerLobbyIpcType = reverseMap(sapphire.ServerLobbyIpcType)
+
+// ClientLobbyIpcType - Value-first version of sapphire.ClientLobbyIpcType
+var ClientLobbyIpcType = reverseMap(sapphire.ClientLobbyIpcType)
+
+// ServerZoneIpcType - Value-first version of sapphire.ServerZoneIpcType
+var ServerZoneIpcType = reverseMap(sapphire.ServerZoneIpcType)
+
+// ClientZoneIpcType - Value-first version of sapphire.ClientZoneIpcType
+var ClientZoneIpcType = reverseMap(sapphire.ClientZoneIpcType)
+
+// ServerChatIpcType - Value-first version of sapphire.ServerChatIpcType
+var ServerChatIpcType = reverseMap(sapphire.ServerChatIpcType)
+
+// ClientChatIpcType - Value-first version of sapphire.ClientChatIpcType
+var ClientChatIpcType = reverseMap(sapphire.ClientChatIpcType)
 
 func main() {
 	// Map out args
@@ -42,13 +52,13 @@ func main() {
 	}
 
 	// Get the default network device (probably)
-	defaultNetIface, err0 := net.InterfaceByIndex(0)
+	netIfaces, err0 := devices.ListDeviceNames(false, false)
 	if err0 != nil {
 		log.Fatal(err0)
 	}
 
 	// Initialize a sniffer on the default network device
-	sniffer, err1 := zanarkand.NewSniffer("", defaultNetIface.Name)
+	sniffer, err1 := zanarkand.NewSniffer("", netIfaces[0])
 	if err1 != nil {
 		log.Fatal(err1)
 	}

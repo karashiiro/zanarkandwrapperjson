@@ -5,8 +5,8 @@ import (
 	"encoding/binary"
 	"fmt"
 	"log"
-	"strings"
 	"net/http"
+	"strings"
 
 	"github.com/ayyaruq/zanarkand"
 )
@@ -22,46 +22,48 @@ func parsePacket(frame *zanarkand.Frame, region string, port uint16) {
 	ipcPacket.ServerID = binary.LittleEndian.Uint16(frame.Body[ServerID : ServerID+2])
 	ipcPacket.Timestamp = binary.LittleEndian.Uint32(frame.Body[Timestamp : Timestamp+2])
 
-	var type string
+	var ipcType string
 	var ok bool
 
 	switch frame.Connection {
 	case 0:
-		type, ok = ServerLobbyIpcType[ipcPacket.Opcode]
-		if (!ok) {
-			type, ok = ClientLobbyIpcType[ipcPacket.Opcode]
+		ipcType, ok = ServerLobbyIpcType[ipcPacket.Opcode]
+		if !ok {
+			ipcType, ok = ClientLobbyIpcType[ipcPacket.Opcode]
 		}
-		if (!ok) {
-			type = "unknown"
+		if !ok {
+			ipcType = "unknown"
 		}
 		break
 	case 1:
-		type, ok = ServerZoneIpcType[ipcPacket.Opcode]
-		if (!ok) {
-			type, ok = ClientZoneIpcType[ipcPacket.Opcode]
+		ipcType, ok = ServerZoneIpcType[ipcPacket.Opcode]
+		if !ok {
+			ipcType, ok = ClientZoneIpcType[ipcPacket.Opcode]
 		}
-		if (!ok) {
-			type = "unknown"
+		if !ok {
+			ipcType = "unknown"
 		}
 		break
 	case 2:
-		type, ok = ServerChatIpcType[ipcPacket.Opcode]
-		if (!ok) {
-			type, ok = ClientChatIpcType[ipcPacket.Opcode]
+		ipcType, ok = ServerChatIpcType[ipcPacket.Opcode]
+		if !ok {
+			ipcType, ok = ClientChatIpcType[ipcPacket.Opcode]
 		}
-		if (!ok) {
-			type = "unknown"
+		if !ok {
+			ipcType = "unknown"
 		}
 		break
 	}
 
-	type = strings.ToLower(type[0]) + type[1:]
+	ipcType = strings.ToLower(ipcType[0:1]) + ipcType[1:]
 
-	if type[0:12] == "actorControl" {
+	if ipcType[0:12] == "actorControl" {
 		// ActorControlCategory
-	} else if type[0:13] == "clientTrigger" {
+	} else if ipcType[0:13] == "clientTrigger" {
 		// ClientTriggerCategory
 	}
+
+	ipcPacket.Type = ipcType
 
 	serializePacket(ipcPacket, region, port)
 }
