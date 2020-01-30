@@ -31,6 +31,12 @@ var ServerChatIpcType = reverseMap(sapphire.ServerChatIpcType)
 // ClientChatIpcType - Value-first version of sapphire.ClientChatIpcType
 var ClientChatIpcType = reverseMap(sapphire.ClientChatIpcType)
 
+// ActorControlType - Value-first version of sapphire.ActorControlType
+var ActorControlType = reverseMap(sapphire.ActorControlType)
+
+// ClientTriggerType - Value-first version of sapphire.ClientTriggerType
+var ClientTriggerType = reverseMap(sapphire.ClientTriggerType)
+
 func main() {
 	os.Exit(goLikeMain())
 }

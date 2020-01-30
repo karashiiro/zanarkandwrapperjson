@@ -2,13 +2,21 @@ package zanarkandwrapperjson
 
 import (
 	"bytes"
+	"encoding/binary"
 	"fmt"
 	"log"
 	"net/http"
 	"strings"
 
 	"github.com/ayyaruq/zanarkand"
+
+	"github.com/karashiiro/ZanarkandWrapperJSON/sapphire"
 )
+
+var actorControl uint16 = sapphire.ServerLobbyIpcType["ActorControl"]
+var actorControlSelf uint16 = sapphire.ServerLobbyIpcType["ActorControlSelf"]
+var actorControlTarget uint16 = sapphire.ServerLobbyIpcType["ActorControlTarget"]
+var clientTrigger uint16 = sapphire.ServerLobbyIpcType["ClientTrigger"]
 
 func parseMessage(message *zanarkand.GameEventMessage, region string, port uint16) {
 	var ipcType string
@@ -38,10 +46,10 @@ func parseMessage(message *zanarkand.GameEventMessage, region string, port uint1
 
 	var actorControlCategory string
 	var clientTriggerCategory string
-	if ipcType[0:12] == "actorControl" {
-		// ActorControlCategory
-	} else if ipcType[0:13] == "clientTrigger" {
-		// ClientTriggerCategory
+	if message.Opcode == actorControl || message.Opcode == actorControlSelf || message.Opcode == actorControlTarget {
+		actorControlCategory = ActorControlType[binary.LittleEndian.Uint16(message.Body[IpcData:IpcData+2])]
+	} else if message.Opcode == clientTrigger {
+		clientTriggerCategory = ClientTriggerType[binary.LittleEndian.Uint16(message.Body[IpcData:IpcData+2])]
 	}
 
 	serializePacket(message, ipcType, actorControlCategory, clientTriggerCategory, region, port)
