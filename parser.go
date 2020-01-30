@@ -3,6 +3,7 @@ package zanarkandwrapperjson
 import (
 	"bytes"
 	"encoding/binary"
+	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
@@ -56,39 +57,49 @@ func parseMessage(message *zanarkand.GameEventMessage, region string, port uint1
 }
 
 func serializePacket(message *zanarkand.GameEventMessage, ipcType string, actorControlCategory string, clientTriggerCategory string, region string, port uint16) {
-	// Use strings.Builder instead
-	json := "{"
-	json += "\"type\":\"" + ipcType + "\","
-	json += "\"opcode\":\"" + fmt.Sprint(message.Opcode) + "\","
-	json += "\"region\":\"" + region + "\","
-	json += "\"packetSize\":\"" + fmt.Sprint(message.Length) + "\","
-	json += "\"segmentType\":\"" + fmt.Sprint(message.Segment) + "\","
+	var outputBase OutputBase
+	var ipcBase IpcBase
+	var ipcActorClientControl IpcActorClientControl
+
+	outputBase.Type = ipcType
+	outputBase.Opcode = message.Opcode
+	outputBase.Region = region
+	outputBase.PacketSize = message.Length
+	outputBase.SegmentType = message.Segment
+
 	if message.Segment == 3 {
-		json += "\"sourceActorSessionID\":\"" + fmt.Sprint(message.SourceActor) + "\","
-		json += "\"targetActorSessionID\":\"" + fmt.Sprint(message.TargetActor) + "\","
-		json += "\"serverID\":\"" + fmt.Sprint(message.ServerID) + "\","
-		json += "\"timestamp\":\"" + fmt.Sprint(message.Timestamp) + "\","
+		ipcBase.OutputBase = outputBase
+		ipcBase.SourceActor = message.SourceActor
+		ipcBase.TargetActor = message.TargetActor
+		ipcBase.ServerID = message.ServerID
+		ipcBase.Timestamp = message.Timestamp
 
 		// To cut down on data transfer a bit, we trim this. The useful data before this is parsed by now anyways.
 		message.Body = message.Body[0x20:]
 
 		if actorControlCategory != "" {
-			json += "\"superType\":\"actorControl\","
-			json += "\"subType\":\"" + actorControlCategory + "\","
+			ipcActorClientControl.IpcBase = ipcBase
+			ipcActorClientControl.SuperType = "actorControl"
+			ipcActorClientControl.SubType = actorControlCategory
 		} else if clientTriggerCategory != "" {
-			json += "\"superType\":\"clientTrigger\","
-			json += "\"subType\":\"" + clientTriggerCategory + "\","
+			ipcActorClientControl.IpcBase = ipcBase
+			ipcActorClientControl.SuperType = "clientTrigger"
+			ipcActorClientControl.SubType = clientTriggerCategory
 		}
 	}
-	json += "\"data\":["
-	for i := 0; i < len(message.Body)-1; i++ {
-		json += fmt.Sprint(message.Body[i]) + ","
-	}
-	json += fmt.Sprint(message.Body[len(message.Body)])
-	json += "]}"
+
+	outputBase.Body = message.Body
 
 	var buf bytes.Buffer
-	buf.WriteString(json)
+	var bytes []byte
+	if ipcActorClientControl.SubType != "" {
+		bytes, _ = json.Marshal(ipcActorClientControl)
+	} else if ipcBase.TargetActor != 0 {
+		bytes, _ = json.Marshal(ipcBase)
+	} else {
+		bytes, _ = json.Marshal(outputBase)
+	}
+	buf.Write(bytes)
 	_, err := http.Post("http://localhost:"+fmt.Sprint(port), "application/json", &buf)
 	if err != nil {
 		log.Println(err)
