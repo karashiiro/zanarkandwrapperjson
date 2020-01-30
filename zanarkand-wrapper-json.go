@@ -61,7 +61,7 @@ var ServerLobbyIpcTypeKR = reverseMap(sapphire.ServerLobbyIpcTypeKR)
 // ClientLobbyIpcTypeKR - Value-first version of sapphire.ClientLobbyIpcTypeKR
 var ClientLobbyIpcTypeKR = reverseMap(sapphire.ClientLobbyIpcTypeKR)
 
-// ServerZoneIpcType - Value-first version of sapphire.ServerZoneIpcTypeKR
+// ServerZoneIpcTypeKR - Value-first version of sapphire.ServerZoneIpcTypeKR
 var ServerZoneIpcTypeKR = reverseMap(sapphire.ServerZoneIpcTypeKR)
 
 // ClientZoneIpcTypeKR - Value-first version of sapphire.ClientZoneIpcTypeKR
@@ -128,9 +128,7 @@ func goLikeMain() int {
 			case "kill":
 				return 0
 			case "start":
-				if !sniffer.Active() {
-					go subscriber.Subscribe(sniffer)
-				}
+				go subscriber.Subscribe(sniffer)
 			case "stop":
 				if sniffer.Active() {
 					sniffer.Stop()
