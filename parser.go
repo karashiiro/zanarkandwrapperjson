@@ -75,7 +75,7 @@ func serializePacket(message *zanarkand.GameEventMessage, ipcType string, actorC
 		ipcBase.Timestamp = message.Timestamp
 
 		// To cut down on data transfer a bit, we trim this. The useful data before this is parsed by now anyways.
-		message.Body = message.Body[0x20:]
+		message.Body = message.Body[IpcData:]
 
 		if actorControlCategory != "" {
 			ipcActorClientControl.IpcBase = ipcBase
