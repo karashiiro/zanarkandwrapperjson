@@ -20,28 +20,7 @@ var actorControlTarget uint16 = sapphire.ServerLobbyIpcType["ActorControlTarget"
 var clientTrigger uint16 = sapphire.ServerLobbyIpcType["ClientTrigger"]
 
 func parseMessage(message *zanarkand.GameEventMessage, region string, port uint16) {
-	var ipcType string
-	var ok bool
-
-	ipcType, ok = ServerLobbyIpcType[message.Opcode]
-	if !ok {
-		ipcType, ok = ClientLobbyIpcType[message.Opcode]
-	}
-	if !ok {
-		ipcType, ok = ServerZoneIpcType[message.Opcode]
-	}
-	if !ok {
-		ipcType, ok = ClientZoneIpcType[message.Opcode]
-	}
-	if !ok {
-		ipcType, ok = ServerChatIpcType[message.Opcode]
-	}
-	if !ok {
-		ipcType, ok = ClientChatIpcType[message.Opcode]
-	}
-	if !ok {
-		ipcType = "unknown"
-	}
+	ipcType := getPacketType(message.Opcode, region)
 
 	ipcType = strings.ToLower(ipcType[0:1]) + ipcType[1:]
 
@@ -94,7 +73,7 @@ func serializePacket(message *zanarkand.GameEventMessage, ipcType string, actorC
 	var bytes []byte
 	if ipcActorClientControl.SubType != "" {
 		bytes, _ = json.Marshal(ipcActorClientControl)
-	} else if ipcBase.TargetActor != 0 {
+	} else if ipcBase.SourceActor != 0 {
 		bytes, _ = json.Marshal(ipcBase)
 	} else {
 		bytes, _ = json.Marshal(outputBase)
@@ -104,4 +83,69 @@ func serializePacket(message *zanarkand.GameEventMessage, ipcType string, actorC
 	if err != nil {
 		log.Println(err)
 	}
+}
+
+func getPacketType(opcode uint16, region string) string {
+	var ipcType string
+	var ok bool
+	if region == "Global" {
+		ipcType, ok = ServerLobbyIpcType[opcode]
+		if !ok {
+			ipcType, ok = ClientLobbyIpcType[opcode]
+		}
+		if !ok {
+			ipcType, ok = ServerZoneIpcType[opcode]
+		}
+		if !ok {
+			ipcType, ok = ClientZoneIpcType[opcode]
+		}
+		if !ok {
+			ipcType, ok = ServerChatIpcType[opcode]
+		}
+		if !ok {
+			ipcType, ok = ClientChatIpcType[opcode]
+		}
+	} else if region == "CN" {
+		// NYI
+		ipcType, ok = ServerLobbyIpcTypeCN[opcode]
+		if !ok {
+			ipcType, ok = ClientLobbyIpcTypeCN[opcode]
+		}
+		if !ok {
+			ipcType, ok = ServerZoneIpcTypeCN[opcode]
+		}
+		if !ok {
+			ipcType, ok = ClientZoneIpcTypeCN[opcode]
+		}
+		if !ok {
+			ipcType, ok = ServerChatIpcTypeCN[opcode]
+		}
+		if !ok {
+			ipcType, ok = ClientChatIpcTypeCN[opcode]
+		}
+	} else if region == "KR" {
+		// NYI
+		ipcType, ok = ServerLobbyIpcTypeKR[opcode]
+		if !ok {
+			ipcType, ok = ClientLobbyIpcTypeKR[opcode]
+		}
+		if !ok {
+			ipcType, ok = ServerZoneIpcTypeKR[opcode]
+		}
+		if !ok {
+			ipcType, ok = ClientZoneIpcTypeKR[opcode]
+		}
+		if !ok {
+			ipcType, ok = ServerChatIpcTypeKR[opcode]
+		}
+		if !ok {
+			ipcType, ok = ClientChatIpcTypeKR[opcode]
+		}
+	}
+
+	if !ok {
+		ipcType = "unknown"
+	}
+
+	return ipcType
 }
