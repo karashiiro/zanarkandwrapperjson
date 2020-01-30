@@ -2,10 +2,9 @@ package zanarkandwrapperjson
 
 import (
 	"bufio"
+	"flag"
 	"log"
 	"os"
-	"sort"
-	"strconv"
 	"time"
 
 	"github.com/ayyaruq/zanarkand"
@@ -33,86 +32,73 @@ var ServerChatIpcType = reverseMap(sapphire.ServerChatIpcType)
 var ClientChatIpcType = reverseMap(sapphire.ClientChatIpcType)
 
 func main() {
-	// Map out args
-	args := sort.StringSlice(os.Args[1:])
+	os.Exit(goLikeMain())
+}
+
+func goLikeMain() int {
 	// MonitorType doesn't apply, nor do ProcessID and IPIndex
-	regionIndex := args.Search("--Region")
-	var region string
-	if regionIndex != -1 {
-		region = args[regionIndex+1]
-	}
-	portIndex := args.Search("--Port")
-	var port uint16
-	if portIndex != -1 {
-		tmpPort, err0 := strconv.ParseUint(args[portIndex+1], 10, 2)
-		port = uint16(tmpPort)
-		if err0 != nil {
-			log.Fatal(err0)
+	region := flag.String("-Region", "Global", "Sets the IPC version to Global/CN/KR.")
+	port := flag.Uint64("-Port", 13346, "Sets the port for the IPC connection between this application and Node.js.")
+
+	// Setup our control mechanism
+	commander := make(chan string)
+	go func(input chan string) {
+		stdin := bufio.NewReader(os.Stdin)
+		for {
+			cmd, err := stdin.ReadString('\n')
+			if err != nil {
+				log.Printf("Error reading command code: %v", err)
+				close(input)
+			}
+			input <- cmd
 		}
-	}
+	}(commander)
 
 	// Get the default network device (probably)
-	netIfaces, err0 := devices.ListDeviceNames(false, false)
-	if err0 != nil {
-		log.Fatal(err0)
+	netIfaces, err := devices.ListDeviceNames(false, false)
+	if err != nil {
+		log.Fatal(err)
+		return 1
 	}
 
 	// Initialize a sniffer on the default network device
-	sniffer, err1 := zanarkand.NewSniffer("", netIfaces[0])
-	if err1 != nil {
-		log.Fatal(err1)
+	sniffer, err := zanarkand.NewSniffer("", netIfaces[0])
+	if err != nil {
+		log.Fatal(err)
+		return 1
 	}
+
+	// Cleanly shutdown when we feel like it
+	defer func(sniffer *zanarkand.Sniffer) {
+		if sniffer.Active() {
+			sniffer.Stop()
+			time.Sleep(500) // time to drain
+		}
+	}(sniffer)
+
 	subscriber := zanarkand.NewGameEventSubscriber()
 
-	// Run loops
-	var input string
-	var lastErr error
-	go inputLoop(&input, &lastErr)
-	go inputProcssingLoop(&input, &lastErr, sniffer, subscriber)
-
-	parseLoop(subscriber, region, port)
-}
-
-// Take input instantly
-func inputLoop(input *string, lastErr *error) {
-	stdin := bufio.NewReader(os.Stdin)
-
+	// Control loop
 	for {
-		*input, *lastErr = stdin.ReadString('\n')
-	}
-}
-
-// Process inputs every 200ms
-func inputProcssingLoop(input *string, lastErr *error, sniffer *zanarkand.Sniffer, subscriber *zanarkand.GameEventSubscriber) {
-	for *input != "kill" {
-		if *lastErr != nil {
-			log.Println(*lastErr)
-			*lastErr = nil
+		select {
+		case command := <-commander:
+			switch command {
+			case "kill":
+				return 0
+			case "start":
+				if !sniffer.Active() {
+					go subscriber.Subscribe(sniffer)
+				}
+			case "stop":
+				if sniffer.Active() {
+					sniffer.Stop()
+				}
+			default:
+				log.Println("Unknown command recieved: ", command)
+			}
+		case message := <-subscriber.Events:
+			go parseMessage(message, *region, uint16(*port))
 		}
-
-		if *input == "start" && !sniffer.Active() {
-			go subscriber.Subscribe(sniffer)
-		} else if *input == "stop" && sniffer.Active() {
-			sniffer.Stop()
-		}
-
-		// More than enough time for an input loop users rarely if ever interact with
-		time.Sleep(200)
-	}
-
-	if sniffer.Active() {
-		sniffer.Stop()
-	}
-
-	os.Exit(0)
-}
-
-func parseLoop(subscriber *zanarkand.GameEventSubscriber, region string, port uint16) {
-	for {
-		message := <-subscriber.Events
-
-		// Push the message to the parsing sequence
-		parseMessage(message, region, port)
 	}
 }
 
