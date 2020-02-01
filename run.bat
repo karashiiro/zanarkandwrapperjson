@@ -1,2 +1,0 @@
-ZanarkandWrapperJSON.exe
-pause
