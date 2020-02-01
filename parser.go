@@ -27,9 +27,9 @@ func parseMessage(message *zanarkand.GameEventMessage, region string, port uint1
 	var actorControlCategory string
 	var clientTriggerCategory string
 	if message.Opcode == actorControl || message.Opcode == actorControlSelf || message.Opcode == actorControlTarget {
-		actorControlCategory = ActorControlType[binary.LittleEndian.Uint16(message.Body[IpcData:IpcData+2])]
+		actorControlCategory = ActorControlType[binary.LittleEndian.Uint16(message.Body[0:2])]
 	} else if message.Opcode == clientTrigger {
-		clientTriggerCategory = ClientTriggerType[binary.LittleEndian.Uint16(message.Body[IpcData:IpcData+2])]
+		clientTriggerCategory = ClientTriggerType[binary.LittleEndian.Uint16(message.Body[0:2])]
 	}
 
 	serializePacket(message, ipcType, actorControlCategory, clientTriggerCategory, region, port)
@@ -52,9 +52,6 @@ func serializePacket(message *zanarkand.GameEventMessage, ipcType string, actorC
 		ipcBase.TargetActor = message.TargetActor
 		ipcBase.ServerID = message.ServerID
 		ipcBase.Timestamp = message.Timestamp
-
-		// To cut down on data transfer a bit, we trim this. The useful data before this is parsed by now anyways.
-		message.Body = message.Body[IpcData:]
 
 		if actorControlCategory != "" {
 			ipcActorClientControl.IpcBase = ipcBase
@@ -106,7 +103,6 @@ func getPacketType(opcode uint16, region string) string {
 			ipcType, ok = ClientChatIpcType[opcode]
 		}
 	} else if region == "CN" {
-		// NYI
 		ipcType, ok = ServerLobbyIpcTypeCN[opcode]
 		if !ok {
 			ipcType, ok = ClientLobbyIpcTypeCN[opcode]
@@ -124,7 +120,6 @@ func getPacketType(opcode uint16, region string) string {
 			ipcType, ok = ClientChatIpcTypeCN[opcode]
 		}
 	} else if region == "KR" {
-		// NYI
 		ipcType, ok = ServerLobbyIpcTypeKR[opcode]
 		if !ok {
 			ipcType, ok = ClientLobbyIpcTypeKR[opcode]

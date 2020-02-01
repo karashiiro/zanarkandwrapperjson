@@ -5,6 +5,9 @@ import (
 	"flag"
 	"log"
 	"os"
+	"regexp"
+	"strconv"
+	"strings"
 	"time"
 
 	"github.com/ayyaruq/zanarkand"
@@ -34,15 +37,47 @@ func goLikeMain() int {
 		}
 	}(commander)
 
-	// Get the default network device (probably)
+	// Get the default network device
 	netIfaces, err := devices.ListDeviceNames(false, false)
 	if err != nil {
 		log.Fatal(err)
 		return 1
 	}
+	rNetIfaces, err := devices.ListDeviceNames(false, true)
+	if err != nil {
+		log.Fatal(err)
+		return 1
+	}
+	netIfaceIdx := len(netIfaces) - 1
+	for i, nif := range rNetIfaces {
+		nif = strings.TrimFunc(nif, func(c rune) bool {
+			return c == '[' || c == ']'
+		})
+		// Looking for ranges:
+		// 24-bit private block: 10.*.*.*
+		// 20-bit private block: 172.16.*.*-172.31.*.*
+		// 16-bit private block: 192.168.*.*
+		ipAddress := regexp.MustCompile("( |\\[|\\])").Split(nif, 3) // Handles IPv6 addresses "DeviceName [ffff::ffff:ffff:ffff:ffff 0.0.0.0]"
+		if len(ipAddress) >= 2 {
+			ipAddress = regexp.MustCompile("\\.").Split(ipAddress[len(ipAddress)-1], 4)[0:2] // Discard third and fourth fields
+		}
+		if ipAddress[0] == "10" {
+			netIfaceIdx = i
+		} else if ipAddress[0] == "172" {
+			net2, err := strconv.Atoi(ipAddress[1])
+			if err != nil {
+				continue
+			}
+			if net2 >= 16 && net2 <= 31 {
+				netIfaceIdx = i
+			}
+		} else if ipAddress[0] == "192" && ipAddress[1] == "168" {
+			netIfaceIdx = i
+		}
+	}
 
-	// Initialize a sniffer on the default network device
-	sniffer, err := zanarkand.NewSniffer("", netIfaces[0])
+	// Initialize a sniffer on the network device
+	sniffer, err := zanarkand.NewSniffer("", netIfaces[netIfaceIdx])
 	if err != nil {
 		log.Fatal(err)
 		return 1
@@ -62,7 +97,7 @@ func goLikeMain() int {
 	for {
 		select {
 		case command := <-commander:
-			switch command {
+			switch strings.Trim(command, "\n\r ") {
 			case "kill":
 				return 0
 			case "start":
@@ -72,7 +107,7 @@ func goLikeMain() int {
 					sniffer.Stop()
 				}
 			default:
-				log.Println("Unknown command recieved: ", command)
+				log.Println("Unknown command recieved: \"", command, "\"")
 			}
 		case message := <-subscriber.Events:
 			go parseMessage(message, *region, uint16(*port))
