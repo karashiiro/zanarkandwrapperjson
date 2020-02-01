@@ -1,4 +1,4 @@
-package zanarkandwrapperjson
+package main
 
 import (
 	"github.com/ayyaruq/zanarkand"
