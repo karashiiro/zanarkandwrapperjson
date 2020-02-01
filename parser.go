@@ -14,10 +14,10 @@ import (
 	"github.com/karashiiro/ZanarkandWrapperJSON/sapphire"
 )
 
-var actorControl uint16 = sapphire.ServerLobbyIpcType["ActorControl"]
-var actorControlSelf uint16 = sapphire.ServerLobbyIpcType["ActorControlSelf"]
-var actorControlTarget uint16 = sapphire.ServerLobbyIpcType["ActorControlTarget"]
-var clientTrigger uint16 = sapphire.ServerLobbyIpcType["ClientTrigger"]
+var actorControl uint16 = sapphire.ServerZoneIpcType["ActorControl"]
+var actorControlSelf uint16 = sapphire.ServerZoneIpcType["ActorControlSelf"]
+var actorControlTarget uint16 = sapphire.ServerZoneIpcType["ActorControlTarget"]
+var clientTrigger uint16 = sapphire.ClientZoneIpcType["ClientTrigger"]
 
 func parseMessage(message *zanarkand.GameEventMessage, region string, port uint16) {
 	ipcType := getPacketType(message.Opcode, region)
@@ -28,53 +28,50 @@ func parseMessage(message *zanarkand.GameEventMessage, region string, port uint1
 	var clientTriggerCategory string
 	if message.Opcode == actorControl || message.Opcode == actorControlSelf || message.Opcode == actorControlTarget {
 		actorControlCategory = ActorControlType[binary.LittleEndian.Uint16(message.Body[0:2])]
+		actorControlCategory = strings.ToLower(actorControlCategory[0:1]) + actorControlCategory[1:]
 	} else if message.Opcode == clientTrigger {
 		clientTriggerCategory = ClientTriggerType[binary.LittleEndian.Uint16(message.Body[0:2])]
+		clientTriggerCategory = strings.ToLower(clientTriggerCategory[0:1]) + clientTriggerCategory[1:]
 	}
 
 	serializePacket(message, ipcType, actorControlCategory, clientTriggerCategory, region, port)
 }
 
 func serializePacket(message *zanarkand.GameEventMessage, ipcType string, actorControlCategory string, clientTriggerCategory string, region string, port uint16) {
-	var outputBase OutputBase
-	var ipcBase IpcBase
-	var ipcActorClientControl IpcActorClientControl
+	var ipcStructure IpcStructure
 
-	outputBase.Type = ipcType
-	outputBase.Opcode = message.Opcode
-	outputBase.Region = region
-	outputBase.PacketSize = message.Length
-	outputBase.SegmentType = message.Segment
+	ipcStructure.Type = ipcType
+	ipcStructure.Opcode = message.Opcode
+	ipcStructure.Region = region
+	ipcStructure.PacketSize = message.Length
+	ipcStructure.SegmentType = message.Segment
 
 	if message.Segment == 3 {
-		ipcBase.OutputBase = outputBase
-		ipcBase.SourceActor = message.SourceActor
-		ipcBase.TargetActor = message.TargetActor
-		ipcBase.ServerID = message.ServerID
-		ipcBase.Timestamp = message.Timestamp
+		ipcStructure.SourceActor = message.SourceActor
+		ipcStructure.TargetActor = message.TargetActor
+		ipcStructure.ServerID = message.ServerID
+		ipcStructure.Timestamp = message.Timestamp.Unix()
 
 		if actorControlCategory != "" {
-			ipcActorClientControl.IpcBase = ipcBase
-			ipcActorClientControl.SuperType = "actorControl"
-			ipcActorClientControl.SubType = actorControlCategory
+			ipcStructure.SuperType = "actorControl"
+			ipcStructure.SubType = actorControlCategory
 		} else if clientTriggerCategory != "" {
-			ipcActorClientControl.IpcBase = ipcBase
-			ipcActorClientControl.SuperType = "clientTrigger"
-			ipcActorClientControl.SubType = clientTriggerCategory
+			ipcStructure.SuperType = "clientTrigger"
+			ipcStructure.SubType = clientTriggerCategory
 		}
 	}
 
-	outputBase.Body = message.Body
+	// JSON marshalling doesn't work on bytes, byte arrays are converted into strings and need to be bitshifted out later, presumably?
+	// At any rate, it's not compatible with how .NET serializes byte arrays.
+	serializedData := make([]int, len(message.Body))
+	for i, b := range message.Body {
+		serializedData[i] = int(b)
+	}
+	ipcStructure.Body = serializedData
 
 	var buf bytes.Buffer
 	var bytes []byte
-	if ipcActorClientControl.SubType != "" {
-		bytes, _ = json.Marshal(ipcActorClientControl)
-	} else if ipcBase.SourceActor != 0 {
-		bytes, _ = json.Marshal(ipcBase)
-	} else {
-		bytes, _ = json.Marshal(outputBase)
-	}
+	bytes, _ = json.Marshal(ipcStructure)
 	buf.Write(bytes)
 	_, err := http.Post("http://localhost:"+fmt.Sprint(port), "application/json", &buf)
 	if err != nil {
