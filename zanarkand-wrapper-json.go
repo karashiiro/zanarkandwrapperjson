@@ -19,9 +19,10 @@ func main() {
 }
 
 func goLikeMain() int {
-	// MonitorType doesn't apply, nor do ProcessID and IPIndex
+	// MonitorType doesn't apply, nor do ProcessID or ParseAlgorithm
 	region := flag.String("-Region", "Global", "Sets the IPC version to Global/CN/KR.")
 	port := flag.Uint64("-Port", 13346, "Sets the port for the IPC connection between this application and Node.js.")
+	networkDevice := net.ParseIP(*flag.String("-LocalIP", "", "Specifies a network to capture traffic on."))
 
 	// Setup our control mechanism
 	commander := make(chan string)
@@ -42,9 +43,11 @@ func goLikeMain() int {
 	// 24-bit private block: 10.*.*.*
 	// 20-bit private block: 172.16.*.*-172.31.*.*
 	// 16-bit private block: 192.168.*.*
+	// 16-bit APIPA block: 169.254.*.*
 	_, subnet24, _ := net.ParseCIDR("10.0.0.0/8")
 	_, subnet20, _ := net.ParseCIDR("172.16.0.0/12")
 	_, subnet16, _ := net.ParseCIDR("192.168.0.0/16")
+	_, APIPA16, _ := net.ParseCIDR("169.254.0.0/16")
 
 	rNetIfaces, err := devices.ListDeviceNames(false, true)
 	if err != nil {
@@ -55,7 +58,11 @@ func goLikeMain() int {
 	netIfaceIdx := len(netIfaces) - 1
 	for i, nif := range rNetIfaces {
 		ip := net.ParseIP(regexp.MustCompile("\\d+\\.\\d+\\.\\d+\\.\\d+").FindString(nif)) // Lazy but it works and it only runs once
-		if subnet24.Contains(ip) || subnet20.Contains(ip) || subnet16.Contains(ip) {
+		if networkDevice != nil && networkDevice.Equal(ip) {
+			netIfaceIdx = i
+			break
+		}
+		if subnet24.Contains(ip) || subnet20.Contains(ip) || subnet16.Contains(ip) || APIPA16.Contains(ip) {
 			netIfaceIdx = i
 		}
 	}
