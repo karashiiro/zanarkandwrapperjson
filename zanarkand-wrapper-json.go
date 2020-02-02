@@ -4,14 +4,14 @@ import (
 	"bufio"
 	"flag"
 	"log"
+	"net"
 	"os"
 	"regexp"
-	"strconv"
 	"strings"
 	"time"
 
 	"github.com/ayyaruq/zanarkand"
-	devices "github.com/ayyaruq/zanarkand/devices"
+	"github.com/ayyaruq/zanarkand/devices"
 )
 
 func main() {
@@ -38,40 +38,24 @@ func goLikeMain() int {
 	}(commander)
 
 	// Get the default network device
-	netIfaces, err := devices.ListDeviceNames(false, false)
-	if err != nil {
-		log.Fatal(err)
-		return 1
-	}
+	// Looking for ranges:
+	// 24-bit private block: 10.*.*.*
+	// 20-bit private block: 172.16.*.*-172.31.*.*
+	// 16-bit private block: 192.168.*.*
+	_, subnet24, _ := net.ParseCIDR("10.0.0.0/8")
+	_, subnet20, _ := net.ParseCIDR("172.16.0.0/12")
+	_, subnet16, _ := net.ParseCIDR("192.168.0.0/16")
+
 	rNetIfaces, err := devices.ListDeviceNames(false, true)
 	if err != nil {
 		log.Fatal(err)
 		return 1
 	}
+	netIfaces, _ := devices.ListDeviceNames(false, false) // It seems safe to assume that if the call that includes this and more doesn't error, this will not error if called immediately after either
 	netIfaceIdx := len(netIfaces) - 1
 	for i, nif := range rNetIfaces {
-		nif = strings.TrimFunc(nif, func(c rune) bool {
-			return c == '[' || c == ']'
-		})
-		// Looking for ranges:
-		// 24-bit private block: 10.*.*.*
-		// 20-bit private block: 172.16.*.*-172.31.*.*
-		// 16-bit private block: 192.168.*.*
-		ipAddress := regexp.MustCompile("( |\\[|\\])").Split(nif, 3) // Handles IPv6 addresses "DeviceName [ffff::ffff:ffff:ffff:ffff 0.0.0.0]"
-		if len(ipAddress) >= 2 {
-			ipAddress = regexp.MustCompile("\\.").Split(ipAddress[len(ipAddress)-1], 4)[0:2] // Discard third and fourth fields
-		}
-		if ipAddress[0] == "10" {
-			netIfaceIdx = i
-		} else if ipAddress[0] == "172" {
-			net2, err := strconv.Atoi(ipAddress[1])
-			if err != nil {
-				continue
-			}
-			if net2 >= 16 && net2 <= 31 {
-				netIfaceIdx = i
-			}
-		} else if ipAddress[0] == "192" && ipAddress[1] == "168" {
+		ip := net.ParseIP(regexp.MustCompile("\\d+\\.\\d+\\.\\d+\\.\\d+").FindString(nif)) // Lazy but it works and it only runs once
+		if subnet24.Contains(ip) || subnet20.Contains(ip) || subnet16.Contains(ip) {
 			netIfaceIdx = i
 		}
 	}
@@ -92,6 +76,19 @@ func goLikeMain() int {
 	}(sniffer)
 
 	subscriber := zanarkand.NewGameEventSubscriber()
+
+	/*go sniffer.Start()
+	for {
+		frame, _ := sniffer.NextFrame()
+		if frame != nil {
+			gross := make([]int, len(frame.Body))
+			for i, b := range frame.Body {
+				gross[i] = int(b)
+			}
+			str, _ := json.Marshal(gross)
+			log.Println(string(str))
+		}
+	}*/
 
 	// Control loop
 	for {
