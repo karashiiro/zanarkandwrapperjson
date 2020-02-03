@@ -20,7 +20,7 @@ var actorControlTarget uint16 = sapphire.ServerZoneIpcType["ActorControlTarget"]
 var clientTrigger uint16 = sapphire.ClientZoneIpcType["ClientTrigger"]
 
 // Cast the message data to a packet structure
-func parseMessage(message *zanarkand.GameEventMessage, region string, port uint16) {
+func parseMessage(message *zanarkand.GameEventMessage, region string, port uint16, isDev bool) {
 	ipcStructure := new(IpcStructure)
 	ipcStructure.GameEventMessage = *message
 	ipcStructure.Region = region
@@ -37,6 +37,10 @@ func parseMessage(message *zanarkand.GameEventMessage, region string, port uint1
 	} else if message.Opcode == clientTrigger {
 		ipcStructure.SuperType = "clientTrigger"
 		ipcStructure.SubType = jsifyString(ClientTriggerType[binary.LittleEndian.Uint16(message.Body[0:2])])
+	}
+
+	if !isDev {
+		ipcStructure.Body = make([]byte, 0)
 	}
 
 	serializePackout(ipcStructure, port)

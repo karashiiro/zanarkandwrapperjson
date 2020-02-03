@@ -23,6 +23,7 @@ func goLikeMain() int {
 	region := flag.String("-Region", "Global", "Sets the IPC version to Global/CN/KR.")
 	port := flag.Uint64("-Port", 13346, "Sets the port for the IPC connection between this application and Node.js.")
 	networkDevice := net.ParseIP(*flag.String("-LocalIP", "", "Specifies a network to capture traffic on."))
+	isDev := flag.Bool("-Dev", false, "Sets the developer mode, enabling raw data output.")
 
 	// Setup our control mechanism
 	commander := make(chan string)
@@ -101,7 +102,7 @@ func goLikeMain() int {
 				log.Println("Unknown command recieved: \"", command, "\"")
 			}
 		case message := <-subscriber.Events:
-			go parseMessage(message, *region, uint16(*port))
+			go parseMessage(message, *region, uint16(*port), *isDev)
 		}
 	}
 }
