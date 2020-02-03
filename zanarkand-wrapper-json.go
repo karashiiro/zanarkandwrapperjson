@@ -84,19 +84,6 @@ func goLikeMain() int {
 
 	subscriber := zanarkand.NewGameEventSubscriber()
 
-	/*go sniffer.Start()
-	for {
-		frame, _ := sniffer.NextFrame()
-		if frame != nil {
-			gross := make([]int, len(frame.Body))
-			for i, b := range frame.Body {
-				gross[i] = int(b)
-			}
-			str, _ := json.Marshal(gross)
-			log.Println(string(str))
-		}
-	}*/
-
 	// Control loop
 	for {
 		select {
