@@ -9,5 +9,8 @@ type IpcStructure struct {
 	SubType   string `json:"subType"`
 	SuperType string `json:"superType"`
 	Type      string `json:"type"`
-	Params    struct{}
+	IpcParameters
 }
+
+// IpcParameters - Holds any IPC struct to be serialized later
+type IpcParameters interface{}
