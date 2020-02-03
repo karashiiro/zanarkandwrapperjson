@@ -9,4 +9,5 @@ type IpcStructure struct {
 	SubType   string `json:"subType"`
 	SuperType string `json:"superType"`
 	Type      string `json:"type"`
+	Params    struct{}
 }
