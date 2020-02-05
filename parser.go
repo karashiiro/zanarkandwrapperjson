@@ -27,7 +27,7 @@ func parseMessage(message *zanarkand.GameEventMessage, region string, port uint1
 
 	ipcStructure.Type = getPacketType(message.Opcode, region)
 
-	ipcStructure.IpcParameters = marshalType(ipcStructure.Type, ipcStructure.Body) // no assignment yet, needs work
+	ipcStructure.IpcParameters = marshalType(ipcStructure.Type, ipcStructure.Body)
 
 	ipcStructure.Type = jsifyString(ipcStructure.Type)
 
