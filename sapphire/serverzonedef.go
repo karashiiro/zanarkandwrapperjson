@@ -1471,36 +1471,23 @@ uint32_t param5 uint32;
 uint8_t unknown[8] uint8;
 };
 
-template< int ArgCount >
-struct EventPlayN
-{
-uint64_t actorId;
-uint32_t eventId;
-uint16_t scene;
-uint16_t padding;
-uint32_t sceneFlags;
-uint8_t paramCount;
-uint8_t padding2[3];
-uint32_t params[ArgCount];
-};
-
 /**
 * Structural representation of the packet sent by the server
 * to play an event
 */
 struct DirectorPlayScene
 {
-uint64_t actorId;
-uint32_t eventId;
-uint16_t scene;
-uint16_t padding;
-uint32_t flags;
-uint32_t param3;
-uint8_t param4;
-uint8_t padding1[3];
-uint32_t param5;
-uint8_t unknown8[0x08];
-uint8_t unknown[0x38];
+uint64_t actorId uint64;
+uint32_t eventId uint32;
+uint16_t scene uint16;
+uint16_t padding uint16;
+uint32_t flags uint32;
+uint32_t param3 uint32;
+uint8_t param4 uint8;
+uint8_t padding1[3] uint8;
+uint32_t param5 uint32;
+uint8_t unknown8[0x08] uint8;
+uint8_t unknown[0x38] uint8;
 };
 
 /**
@@ -1509,20 +1496,37 @@ uint8_t unknown[0x38];
 */
 struct EventFinish
 {
-/* 0000 */ uint32_t eventId;
-/* 0004 */ uint8_t param1;
-/* 0005 */ uint8_t param2;
-/* 0006 */ uint16_t padding;
-/* 0008 */ uint32_t param3;
-/* 000C */ uint32_t padding1;
+/* 0000 */ uint32_t eventId uint32;
+/* 0004 */ uint8_t param1 uint8;
+/* 0005 */ uint8_t param2 uint8;
+/* 0006 */ uint16_t padding uint16;
+/* 0008 */ uint32_t param3 uint32;
+/* 000C */ uint32_t padding1 uint32;
 };
 
-struct EventPlay255 :
-BasePacket< EventPlay255 >,
-EventPlayN< 255 >
+struct EventPlayN
 {
+uint64_t actorId uint64;
+uint32_t eventId uint32;
+uint16_t scene uint16;
+uint16_t padding uint16;
+uint32_t sceneFlags uint32;
+uint8_t paramCount uint8;
+uint8_t padding2[3] uint8;
+uint32_t params[1] uint32;
 };
 
+struct EventPlay255
+{
+uint64_t actorId uint64;
+uint32_t eventId uint32;
+uint16_t scene uint16;
+uint16_t padding uint16;
+uint32_t sceneFlags uint32;
+uint8_t paramCount uint8;
+uint8_t padding2[3] uint8;
+uint32_t params[255] uint32;
+};
 
 /**
 * Structural representation of the packet sent by the server
@@ -1530,15 +1534,15 @@ EventPlayN< 255 >
 */
 struct EventLinkshell
 {
-uint32_t eventId;
-uint8_t scene;
-uint8_t param1;
-uint8_t param2;
-uint8_t param3;
-uint32_t unknown1;
-uint32_t unknown2;
-uint32_t unknown3;
-uint32_t unknown4;
+uint32_t eventId uint32;
+uint8_t scene uint8;
+uint8_t param1 uint8;
+uint8_t param2 uint8;
+uint8_t param3 uint8;
+uint32_t unknown1 uint32;
+uint32_t unknown2 uint32;
+uint32_t unknown3 uint32;
+uint32_t unknown4 uint32;
 };
 
 /**
@@ -1547,7 +1551,7 @@ uint32_t unknown4;
 */
 struct QuestActiveList
 {
-Common::QuestActive activeQuests[30];
+Common::QuestActive activeQuests[30]; // Uh wtf
 };
 
 /**
@@ -1556,9 +1560,9 @@ Common::QuestActive activeQuests[30];
 */
 struct QuestUpdate
 {
-uint16_t slot;
-uint16_t padding;
-Common::QuestActive questInfo;
+uint16_t slot uint16;
+uint16_t padding uint16;
+Common::QuestActive questInfo; // Uh wtf
 };
 
 /**
@@ -1567,8 +1571,8 @@ Common::QuestActive questInfo;
 */
 struct QuestCompleteList
 {
-uint8_t questCompleteMask[480];
-uint8_t unknownCompleteMask[80];
+uint8_t questCompleteMask[480]uint8;
+uint8_t unknownCompleteMask[80]uint8;
 };
 
 /**
@@ -1577,10 +1581,10 @@ uint8_t unknownCompleteMask[80];
 */
 struct QuestFinish
 {
-uint16_t questId;
-uint8_t flag1;
-uint8_t flag2;
-uint32_t padding;
+uint16_t questId uint16;
+uint8_t flag1 uint8;
+uint8_t flag2 uint8;
+uint32_t padding uint32;
 };
 
 /**
@@ -1592,29 +1596,29 @@ uint32_t padding;
 */
 struct QuestMessage
 {
-/* 0000 */ uint32_t questId;
-/* 0000 */ uint8_t msgId;
-/* 0000 */ uint8_t type;
-/* 0000 */ uint16_t padding1;
-/* 0000 */ uint32_t var1;
-/* 0000 */ uint32_t var2;
+/* 0000 */ uint32_t questId uint32;
+/* 0000 */ uint8_t msgId uint8;
+/* 0000 */ uint8_t questType uint8; // Note: Changed "type" to "questType"
+/* 0000 */ uint16_t padding1 uint16;
+/* 0000 */ uint32_t var1 uint32;
+/* 0000 */ uint32_t var2 uint32;
 };
 
 struct QuestTracker
 {
-struct TrackerEntry
+	entry[5]struct
 {
-	uint8_t active;
-	uint8_t questIndex;
-} entry[5];
-uint16_t padding[3];
+	uint8_t active uint8;
+	uint8_t questIndex uint8;
+};
+uint16_t padding[3] uint16;
 };
 
 
 struct WeatherChange
 {
-uint32_t weatherId;
-float delay;
+uint32_t weatherId uint32;
+float delay float32;
 };
 
 /**
@@ -1623,8 +1627,8 @@ float delay;
 */
 struct Discovery
 {
-/* 0000 */ uint32_t mapPartId;
-/* 0004 */ uint32_t mapId;
+/* 0000 */ uint32_t mapPartId uint32;
+/* 0004 */ uint32_t mapId uint32;
 };
 
 /**
@@ -1632,7 +1636,7 @@ struct Discovery
 */
 struct FFXIVARR_IPC_UNK322
 {
-/* 0000 */ uint8_t unk[8];
+/* 0000 */ uint8_t unk[8] uint8;
 };
 
 /**
@@ -1640,7 +1644,7 @@ struct FFXIVARR_IPC_UNK322
 */
 struct FFXIVARR_IPC_UNK320
 {
-/* 0000 */ uint8_t unk[0x38];
+/* 0000 */ uint8_t unk[0x38] uint8;
 };
 
 /**
@@ -1649,16 +1653,16 @@ struct FFXIVARR_IPC_UNK320
 */
 struct PrepareZoning
 {
-uint32_t logMessage;
-uint16_t targetZone;
-uint16_t animation;
-uint8_t param4;
-uint8_t hideChar;
-uint8_t fadeOut;
-uint8_t param7;
-uint8_t fadeOutTime;
-uint8_t unknown; // this changes whether or not the destination zone's name displays during the loading screen. Seems to always be 9 (=hidden) when going to an instance and certain zones, 0 otherwise.
-uint16_t padding;
+uint32_t logMessage uint32;
+uint16_t targetZone uint16;
+uint16_t animation uint16;
+uint8_t param4 uint8;
+uint8_t hideChar uint8;
+uint8_t fadeOut uint8;
+uint8_t param7 uint8;
+uint8_t fadeOutTime uint8;
+uint8_t unknown uint8; // this changes whether or not the destination zone's name displays during the loading screen. Seems to always be 9 (=hidden) when going to an instance and certain zones, 0 otherwise.
+uint16_t padding uint16;
 };
 
 /**
@@ -1669,15 +1673,15 @@ uint16_t padding;
 */
 struct CFNotify
 {
-uint32_t state1; // 3 = cancelled, 4 = duty ready
-uint32_t state2; // if state1 == 3, state2 is cancelled reason
+uint32_t state1 uint32; // 3 = cancelled, 4 = duty ready
+uint32_t state2 uint32; // if state1 == 3, state2 is cancelled reason
 
-uint32_t param1; // usually classJobId
-uint32_t param2; // usually flag
-uint32_t param3; // usually languages, sometimes join in progress timestamp
+uint32_t param1 uint32; // usually classJobId
+uint32_t param2 uint32; // usually flag
+uint32_t param3 uint32; // usually languages, sometimes join in progress timestamp
 
-uint16_t param4; // usually roulette id
-uint16_t contents[5];
+uint16_t param4 uint16; // usually roulette id
+uint16_t contents[5] uint16;
 };
 
 /**
@@ -1689,7 +1693,7 @@ uint16_t contents[5];
 */
 struct CFAvailableContents
 {
-uint8_t contents[0x48];
+uint8_t contents[0x48]uint8;
 };
 
 /**
@@ -1699,7 +1703,7 @@ uint8_t contents[0x48];
 struct CFPlayerInNeed
 {
 // Ordered by roulette id
-uint8_t inNeeds[0x10];
+uint8_t inNeeds[0x10]uint8;
 };
 
 /**
@@ -1708,35 +1712,35 @@ uint8_t inNeeds[0x10];
 */
 struct CFDutyInfo
 {
-uint8_t penaltyTime;
-uint8_t unknown[7];
+uint8_t penaltyTime uint8;
+uint8_t unknown[7]uint8;
 };
 
 struct CFRegisterDuty
 {
-uint32_t unknown0; // 0x301
-uint8_t rouletteId; // if it's a daily roulette
-uint8_t unknown1; // 0xDB
-uint16_t contentId;
+uint32_t unknown0 uint32; // 0x301
+uint8_t rouletteId uint8; // if it's a daily roulette
+uint8_t unknown1 uint8; // 0xDB
+uint16_t contentId uint16;
 };
 
 
 struct CFMemberStatus
 {
-uint16_t contentId;
-uint16_t unknown1;
-uint8_t status;
-uint8_t currentTank;
-uint8_t currentDps;
-uint8_t currentHealer;
-uint8_t estimatedTime;
-uint8_t unknown2[3];
-uint32_t unknown3;
+uint16_t contentId uint16;
+uint16_t unknown1 uint16;
+uint8_t status uint8;
+uint8_t currentTank uint8;
+uint8_t currentDps uint8;
+uint8_t currentHealer uint8;
+uint8_t estimatedTime uint8;
+uint8_t unknown2[3] uint8;
+uint32_t unknown3 uint32;
 };
 
 struct EorzeaTimeOffset
 {
-uint64_t timestamp;
+uint64_t timestamp uint64;
 };
 
 /**
@@ -1745,7 +1749,7 @@ uint64_t timestamp;
 */
 struct EquipDisplayFlags
 {
-uint8_t bitmask;
+uint8_t bitmask uint8;
 };
 
 /**
@@ -1754,7 +1758,7 @@ uint8_t bitmask;
 */
 struct Mount
 {
-uint32_t id;
+uint32_t id uint32;
 };
 
 /**
