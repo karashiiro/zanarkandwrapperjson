@@ -1234,62 +1234,62 @@ uint32_t roleActions[10] uint32;
 */
 struct ModelEquip
 {
-/* 0000 */ uint64_t mainWeapon;
-/* 0008 */ uint64_t offWeapon;
-/* 0010 */ uint8_t unk1;
-/* 0011 */ uint8_t classJobId;
-/* 0012 */ uint8_t level;
-/* 0013 */ uint8_t unk2;
-/* 0014 */ uint32_t models[10];
-/* 003C */ uint32_t padding2;
+/* 0000 */ uint64_t mainWeapon uint64;
+/* 0008 */ uint64_t offWeapon uint64;
+/* 0010 */ uint8_t unk1 uint8;
+/* 0011 */ uint8_t classJobId uint8;
+/* 0012 */ uint8_t level uint8;
+/* 0013 */ uint8_t unk2 uint8;
+/* 0014 */ uint32_t models[10] uint32;
+/* 003C */ uint32_t padding2 uint32;
 };
 
 struct Examine
 {
-uint8_t unkFlag1;
-uint8_t unkFlag2;
-char classJob;
-char level;
-uint16_t padding;
-uint16_t titleId;
-char grandCompany;
-char grandCompanyRank;
+uint8_t unkFlag1 uint8;
+uint8_t unkFlag2 uint8;
+char classJob byte;
+char level byte;
+uint16_t padding uint16;
+uint16_t titleId uint16;
+char grandCompany byte;
+char grandCompanyRank byte;
 
-char unknown[6];
-uint32_t u6_fromPSpawn;
-uint32_t u7_fromPSpawn;
-char padding1[8];
-uint64_t mainWeaponModel;
-uint64_t secWeaponModel;
-uint8_t unknown2;
-uint16_t worldId;
-char unknown3[12];
-struct ItemData
+char unknown[6]byte;
+uint32_t u6_fromPSpawn uint32;
+uint32_t u7_fromPSpawn uint32;
+char padding1[8]byte;
+uint64_t mainWeaponModel uint64;
+uint64_t secWeaponModel uint64;
+uint8_t unknown2 uint8;
+uint16_t worldId uint16;
+char unknown3[12]byte;
+entries[14]struct ItemData
 {
-	uint32_t catalogId;
-	uint32_t appearanceCatalogId;
-	uint64_t crafterId;
-	uint8_t quality;
-	uint8_t unknown[3];
-	struct Materia
+	uint32_t catalogId uint32;
+	uint32_t appearanceCatalogId uint32;
+	uint64_t crafterId uint64;
+	uint8_t quality uint8;
+	uint8_t unknown[3] uint8;
+	materia[5]struct Materia
 	{
-	uint16_t materiaId;
-	uint16_t tier;
-	} materia[5];
-} entries[14];
-char name[32];
-char padding2;
-char unk3[16];
-char look[26];
-char padding3[5];
-uint32_t models[10];
-char unknown4[200];
+	uint16_t materiaId uint16;
+	uint16_t tier uint16;
+	};
+};
+char name[32] byte;
+char padding2 byte;
+char unk3[16] byte;
+char look[26] byte;
+char padding3[5] byte;
+uint32_t models[10] uint32;
+char unknown4[200] byte;
 };
 
 struct CharaNameReq
 {
-uint64_t contentId;
-char name[32];
+uint64_t contentId uint64;
+char name[32]byte;
 };
 
 /**
@@ -1298,32 +1298,32 @@ char name[32];
 */
 struct ItemInfo
 {
-uint32_t containerSequence;
-uint32_t unknown;
-uint16_t containerId;
-uint16_t slot;
-uint32_t quantity;
-uint32_t catalogId;
-uint32_t reservedFlag;
-uint64_t signatureId;
-uint8_t hqFlag;
-uint8_t unknown2;
-uint16_t condition;
-uint16_t spiritBond;
-uint16_t stain;
-uint32_t glamourCatalogId;
-uint16_t materia1;
-uint16_t materia2;
-uint16_t materia3;
-uint16_t materia4;
-uint16_t materia5;
-uint8_t buffer1;
-uint8_t buffer2;
-uint8_t buffer3;
-uint8_t buffer4;
-uint8_t buffer5;
-uint8_t padding;
-uint32_t unknown10;
+uint32_t containerSequence uint32;
+uint32_t unknown uint32;
+uint16_t containerId uint16;
+uint16_t slot uint16;
+uint32_t quantity uint32;
+uint32_t catalogId uint32;
+uint32_t reservedFlag uint32;
+uint64_t signatureId uint64;
+uint8_t hqFlag uint8;
+uint8_t unknown2 uint8;
+uint16_t condition uint16;
+uint16_t spiritBond uint16;
+uint16_t stain uint16;
+uint32_t glamourCatalogId uint32;
+uint16_t materia1 uint16;
+uint16_t materia2 uint16;
+uint16_t materia3 uint16;
+uint16_t materia4 uint16;
+uint16_t materia5 uint16;
+uint8_t tier1 uint8;
+uint8_t tier2 uint8;
+uint8_t tier3 uint8;
+uint8_t tier4 uint8;
+uint8_t tier5 uint8;
+uint8_t padding uint8;
+uint32_t unknown10 uint32;
 };
 
 /**
@@ -1332,10 +1332,10 @@ uint32_t unknown10;
 */
 struct ContainerInfo
 {
-uint32_t containerSequence;
-uint32_t numItems;
-uint32_t containerId;
-uint32_t unknown;
+uint32_t containerSequence uint32;
+uint32_t numItems uint32;
+uint32_t containerId uint32;
+uint32_t unknown uint32;
 };
 
 /**
@@ -1344,49 +1344,49 @@ uint32_t unknown;
 */
 struct CurrencyCrystalInfo
 {
-uint32_t containerSequence;
-uint16_t containerId;
-uint16_t slot;
-uint32_t quantity;
-uint32_t unknown;
-uint32_t catalogId;
-uint32_t unknown1;
-uint32_t unknown2;
-uint32_t unknown3;
+uint32_t containerSequence uint32;
+uint16_t containerId uint16;
+uint16_t slot uint16;
+uint32_t quantity uint32;
+uint32_t unknown uint32;
+uint32_t catalogId uint32;
+uint32_t unknown1 uint32;
+uint32_t unknown2 uint32;
+uint32_t unknown3 uint32;
 };
 
 struct InventoryTransactionFinish
 {
-uint32_t sequenceId;
-uint32_t sequenceId1;
-uint64_t padding;
+uint32_t sequenceId uint32;
+uint32_t sequenceId1 uint32;
+uint64_t padding uint64;
 };
 
 struct InventoryTransaction
 {
-uint32_t sequence;
-uint8_t type;
-uint8_t padding;
-uint16_t padding1;
-uint32_t ownerId;
-uint32_t storageId;
-uint16_t slotId;
-uint16_t padding2;
-uint32_t stackSize;
-uint32_t catalogId;
-uint32_t someActorId;
-int32_t targetStorageId;
-uint32_t padding3[3];
+uint32_t sequence uint32;
+uint8_t transactionType uint8; // Note: Changed "type" to "transactionType"
+uint8_t padding uint8;
+uint16_t padding1 uint16;
+uint32_t ownerId uint32;
+uint32_t storageId uint32;
+uint16_t slotId uint16;
+uint16_t padding2 uint16;
+uint32_t stackSize uint32;
+uint32_t catalogId uint32;
+uint32_t someActorId uint32;
+int32_t targetStorageId int32;
+uint32_t padding3[3] uint32;
 };
 
 
 struct InventoryActionAck
 {
-uint32_t sequence;
-uint16_t type;
-uint16_t padding;
-uint32_t padding1;
-uint32_t padding2;
+uint32_t sequence uint32;
+uint16_t actionType uint16; // Note: Changed "type" to "actionType"
+uint16_t padding uint16;
+uint32_t padding1 uint32;
+uint32_t padding2 uint32;
 };
 
 
@@ -1396,31 +1396,31 @@ uint32_t padding2;
 */
 struct UpdateInventorySlot
 {
-uint32_t sequence;
-uint32_t unknown;
-uint16_t containerId;
-uint16_t slot;
-uint32_t quantity;
-uint32_t catalogId;
-uint32_t reservedFlag;
-uint64_t signatureId;
-uint16_t hqFlag;
-uint16_t condition;
-uint16_t spiritBond;
-uint16_t color;
-uint32_t glamourCatalogId;
-uint16_t materia1;
-uint16_t materia2;
-uint16_t materia3;
-uint16_t materia4;
-uint16_t materia5;
-uint8_t buffer1;
-uint8_t buffer2;
-uint8_t buffer3;
-uint8_t buffer4;
-uint8_t buffer5;
-uint8_t padding;
-uint32_t unknown10;
+uint32_t sequence uint32;
+uint32_t unknown uint32;
+uint16_t containerId uint16;
+uint16_t slot uint16;
+uint32_t quantity uint32;
+uint32_t catalogId uint32;
+uint32_t reservedFlag uint32;
+uint64_t signatureId uint64;
+uint16_t hqFlag uint16;
+uint16_t condition uint16;
+uint16_t spiritBond uint16;
+uint16_t color uint16;
+uint32_t glamourCatalogId uint32;
+uint16_t materia1 uint16;
+uint16_t materia2 uint16;
+uint16_t materia3 uint16;
+uint16_t materia4 uint16;
+uint16_t materia5 uint16;
+uint8_t tier1 uint8;
+uint8_t tier2 uint8;
+uint8_t tier3 uint8;
+uint8_t tier4 uint8;
+uint8_t tier5 uint8;
+uint8_t padding uint8;
+uint32_t unknown10 uint32;
 };
 
 /**
@@ -1429,13 +1429,13 @@ uint32_t unknown10;
 */
 struct EventStart
 {
-/* 0000 */ uint64_t actorId;
-/* 0008 */ uint32_t eventId;
-/* 000C */ uint8_t param1;
-/* 000D */ uint8_t param2;
-/* 000E */ uint16_t padding;
-/* 0010 */ uint32_t param3;
-/* 0014 */ uint32_t padding1;
+/* 0000 */ uint64_t actorId uint64;
+/* 0008 */ uint32_t eventId uint32;
+/* 000C */ uint8_t param1 uint8;
+/* 000D */ uint8_t param2 uint8;
+/* 000E */ uint16_t padding uint16;
+/* 0010 */ uint32_t param3 uint32;
+/* 0014 */ uint32_t padding1 uint32;
 };
 
 /**
@@ -1444,13 +1444,13 @@ struct EventStart
 */
 struct HuntingLogEntry
 {
-int32_t u0; // -1 for all normal classes
-uint8_t rank; // starting from 0
-uint8_t index; // classes and gcs
-uint8_t entries[10][4];
-uint16_t pad;
-uint64_t completeFlags; // 4 bit for each potential entry and the 5th bit for completion of the section
-uint64_t pad1;
+int32_t u0 int32; // -1 for all normal classes
+uint8_t rank uint8; // starting from 0
+uint8_t index uint8; // classes and gcs
+uint8_t entries[10][4] uint8;
+uint16_t pad uint16;
+uint64_t completeFlags uint64; // 4 bit for each potential entry and the 5th bit for completion of the section
+uint64_t pad1 uint64;
 };
 
 /**
@@ -1459,16 +1459,16 @@ uint64_t pad1;
 */
 struct EventPlay
 {
-uint64_t actorId;
-uint32_t eventId;
-uint16_t scene;
-uint16_t padding;
-uint32_t flags;
-uint32_t param3;
-uint8_t param4;
-uint8_t padding1[3];
-uint32_t param5;
-uint8_t unknown[8];
+uint64_t actorId uint64;
+uint32_t eventId uint32;
+uint16_t scene uint16;
+uint16_t padding uint16;
+uint32_t flags uint32;
+uint32_t param3 uint32;
+uint8_t param4 uint8;
+uint8_t padding1[3] uint8;
+uint32_t param5 uint32;
+uint8_t unknown[8] uint8;
 };
 
 template< int ArgCount >
