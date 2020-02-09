@@ -15,11 +15,38 @@ type EffectEntry struct {
 	value           int16
 }
 
+type HousingObject struct {
+	itemId   uint32
+	padding  uint32 // was itemrotation + unknown/pad, looks unused now
+	rotation float32
+	pos      FFXIVARR_POSITION3
+}
+
 type LandIdent struct {
 	landId          uint16
 	wardNum         uint16
 	territoryTypeId uint16
 	worldId         uint16
+}
+
+type LandFlagSet struct {
+	landIdent LandIdent
+	landFlags uint32
+	unkown1   uint32
+}
+
+type QuestActive struct {
+	questId   uint16
+	sequence  uint8
+	flags     uint8
+	padding   uint8
+	BitFlag48 uint8
+	BitFlag40 uint8
+	BitFlag32 uint8
+	BitFlag24 uint8
+	BitFlag16 uint8
+	BitFlag8  uint8
+	padding1  uint8
 }
 
 type StatusEffect struct {

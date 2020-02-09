@@ -118,7 +118,7 @@ type PingHandler struct {
 	/* 0000 */ timestamp uint32 // maybe lol..
 }
 
-type SetSearchInfo struct {
+type SetSearchInfoHandler struct {
 	///* 0000 */ status uint64; // Using the more mangled part of the struct
 	/* 0000 */ status1 uint32
 	/* 0004 */ status2 uint32

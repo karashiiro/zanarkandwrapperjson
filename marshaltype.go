@@ -21,10 +21,6 @@ func marshalType(packetType string, data []byte) interface{} {
 func towerOfBabelSwitchEdition(packetType string) interface{} {
 	switch packetType {
 	// ServerZoneDef.h
-	case "Ping":
-		return new(sapphire.Ping)
-	case "Init":
-		return new(sapphire.Init)
 	// ClientZoneDef.h
 	case "GmCommand1":
 		return new(sapphire.GmCommand1)
@@ -56,8 +52,8 @@ func towerOfBabelSwitchEdition(packetType string) interface{} {
 		return new(sapphire.EventHandlerTalk)
 	case "PingHandler":
 		return new(sapphire.PingHandler)
-	case "SetSearchInfo":
-		return new(sapphire.SetSearchInfo)
+	case "SetSearchInfoHandler":
+		return new(sapphire.SetSearchInfoHandler)
 	case "TellHandler":
 		return new(sapphire.TellHandler)
 	case "ChatHandler":
