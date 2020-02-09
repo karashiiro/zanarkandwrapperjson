@@ -1,7 +1,7 @@
 package sapphire
 
 type FFXIVARR_POSITION3 struct {
-	x float32
-	y float32
-	z float32
+	X float32
+	Y float32
+	Z float32
 }

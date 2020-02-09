@@ -1,42 +1,42 @@
 package sapphire
 
 type Tell struct {
-	contentId      uint64
-	worldId        uint16
-	flags          uint8
-	receipientName [32]byte
-	msg            [1029]byte
+	ContentId      uint64
+	WorldId        uint16
+	Flags          uint8
+	ReceipientName [32]byte
+	Msg            [1029]byte
 }
 
 type TellErrNotFound struct {
-	receipientName [32]byte
+	ReceipientName [32]byte
 }
 
 type FreeCompanyEvent struct {
-	unknown  uint16
-	unknown1 uint16
-	unknown2 uint16
-	unknown3 uint16
-	unknown4 uint16
-	padding  [6]byte
-	eventID  uint8
+	Unknown  uint16
+	Unknown1 uint16
+	Unknown2 uint16
+	Unknown3 uint16
+	Unknown4 uint16
+	Padding  [6]byte
+	EventID  uint8
 	/*
-	 * 0x0F Login
-	 * 0x10 Logout
+	 * 0X0F Login
+	 * 0X10 Logout
 	 */
-	padding1  uint8
-	padding2  [6]byte
-	unknown5  uint16
-	parameter [46]byte
+	Padding1  uint8
+	Padding2  [6]byte
+	Unknown5  uint16
+	Parameter [46]byte
 	/**
-	 * eventID  | parameter usage
-	 * 0x0F       FC name
-	 * 0x10       FC name
+	 * EventID  | parameter usage
+	 * 0X0F       FC name
+	 * 0X10       FC name
 	 */
-	parameter1 [32]byte
+	Parameter1 [32]byte
 	/**
-	 * eventID  | parameter1 usage
-	 * 0x0F       byteacter name
-	 * 0x10       byteacter name
+	 * EventID  | parameter1 usage
+	 * 0X0F       byteacter name
+	 * 0X10       byteacter name
 	 */
 }
