@@ -1410,7 +1410,7 @@ type EventFinish struct {
 	/* 000C */ padding1 uint32
 }
 
-type EventPlayN struct {
+type EventPlay4 struct {
 	ActorId    uint64
 	EventId    uint32
 	Scene      uint16
@@ -1418,7 +1418,51 @@ type EventPlayN struct {
 	SceneFlags uint32
 	ParamCount uint8
 	Padding2   [3]uint8
-	Params     [1]uint32
+	Params     [4]uint32
+}
+
+type EventPlay8 struct {
+	ActorId    uint64
+	EventId    uint32
+	Scene      uint16
+	Padding    uint16
+	SceneFlags uint32
+	ParamCount uint8
+	Padding2   [3]uint8
+	Params     [8]uint32
+}
+
+type EventPlay16 struct {
+	ActorId    uint64
+	EventId    uint32
+	Scene      uint16
+	Padding    uint16
+	SceneFlags uint32
+	ParamCount uint8
+	Padding2   [3]uint8
+	Params     [16]uint32
+}
+
+type EventPlay64 struct {
+	ActorId    uint64
+	EventId    uint32
+	Scene      uint16
+	Padding    uint16
+	SceneFlags uint32
+	ParamCount uint8
+	Padding2   [3]uint8
+	Params     [64]uint32
+}
+
+type EventPlay128 struct {
+	ActorId    uint64
+	EventId    uint32
+	Scene      uint16
+	Padding    uint16
+	SceneFlags uint32
+	ParamCount uint8
+	Padding2   [3]uint8
+	Params     [128]uint32
 }
 
 type EventPlay255 struct {
@@ -1729,7 +1773,7 @@ type LandPriceUpdate struct {
 
 type LandInfoSign struct {
 	LandIdent      LandIdent
-	Uint64         // ither contentId or fcId
+	ownerId        uint64 // ither contentId or fcId
 	Unknow1        uint32
 	HouseIconAdd   uint8
 	HouseSize      uint8
