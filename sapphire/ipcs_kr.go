@@ -2,8 +2,9 @@ package sapphire
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Lobby Connection IPC Codes
-
-// ServerLobbyIpcTypeKR - Server IPC Lobby Type Codes.
+/**
+* Server IPC Lobby Type Codes.
+ */
 var ServerLobbyIpcTypeKR = map[string]uint16{
 	"LobbyError":              0x0002,
 	"LobbyServiceAccountList": 0x000C,
@@ -14,7 +15,9 @@ var ServerLobbyIpcTypeKR = map[string]uint16{
 	"LobbyRetainerList":       0x0017,
 }
 
-// ClientLobbyIpcTypeKR - Client IPC Lobby Type Codes.
+/**
+* Client IPC Lobby Type Codes.
+ */
 var ClientLobbyIpcTypeKR = map[string]uint16{
 	"ReqCharList":       0x0003,
 	"ReqEnterWorld":     0x0004,
@@ -25,8 +28,9 @@ var ClientLobbyIpcTypeKR = map[string]uint16{
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Zone Connection IPC Codes
-
-// ServerZoneIpcTypeKR - Server IPC Zone Type Codes.
+/**
+* Server IPC Zone Type Codes.
+ */
 var ServerZoneIpcTypeKR = map[string]uint16{
 	// static opcode ( the ones that rarely, if ever, change )
 	"Ping":               0x0065,
@@ -39,26 +43,26 @@ var ServerZoneIpcTypeKR = map[string]uint16{
 	"ActorControlTarget": 0x0144,
 	"UpdateHpMpTp":       0x0145,
 	///////////////////////////////////////////////////
-	"ChatBanned":         0x006B,
-	"Playtime":           0x0100, // updated 5.0
-	"Logout":             0x0077, // updated 5.0
-	"CFNotify":           0x0078,
-	"CfPreferredRole":    0x7F, // updated 5.0
-	"CFMemberStatus":     0x0079,
-	"CFDutyInfo":         0x007A,
-	"CFPlayerInNeed":     0x007F,
+	"ChatBanned":      0x006B,
+	"Playtime":        0x0100, // updated 5.0
+	"Logout":          0x0077, // updated 5.0
+	"CFNotify":        0x0078,
+	"CfPreferredRole": 0x007F, // updated 5.0
+	"CFMemberStatus":  0x0079,
+	"CFDutyInfo":      0x007A,
+	//CFPlayerInNeed": 0x007F,
 	"SocialRequestError": 0x00AD,
-	//    CFRegistered: 0x00B8, // updated 4.1
-	//    SocialRequestResponse: 0x00BB, // updated 4.1
-	//    CancelAllianceForming: 0x00C6, // updated 4.2
+	//    CFRegistered": 0x00B8, // updated 4.1
+	//    SocialRequestResponse": 0x00BB, // updated 4.1
+	//    CancelAllianceForming": 0x00C6, // updated 4.2
 	"LogMessage": 0x00D0,
 	"Chat":       0x0104, // updated 5.0
-	//    WorldVisitList: 0x00FE, // added 4.5
+	//    WorldVisitList": 0x00FE, // added 4.5
 	"SocialList":        0x010D, // updated 5.0
 	"ExamineSearchInfo": 0x010F, // added 5.0
 	"UpdateSearchInfo":  0x0110, // updated 5.0
 	"InitSearchInfo":    0x0111, // updated 5.0
-	//    ExamineSearchComment: 0x0102, // updated 4.1
+	//    ExamineSearchComment": 0x0102, // updated 4.1
 	"ServerNoticeShort":          0x0115, // updated 5.0
 	"ServerNotice":               0x0116, // updated 5.0
 	"SetOnlineStatus":            0x0117, // updated 5.0
@@ -78,10 +82,10 @@ var ServerZoneIpcTypeKR = map[string]uint16{
 	"MarketBoardItemListing":        0x013C, // updated 5.0
 	"MarketBoardItemListingHistory": 0x140,  // updated 5.0
 	"MarketBoardSearchResult":       0x14A,  // updated 5.0
-	//    CharaFreeCompanyTag: 0x013B, // updated 4.5
-	//    FreeCompanyBoardMsg: 0x013C, // updated 4.5
-	//    FreeCompanyInfo: 0x013D, // updated 4.5
-	//    ExamineFreeCompanyInfo: 0x013E, // updated 4.5
+	//    CharaFreeCompanyTag": 0x013B, // updated 4.5
+	//    FreeCompanyBoardMsg": 0x013C, // updated 4.5
+	//    FreeCompanyInfo": 0x013D, // updated 4.5
+	//    ExamineFreeCompanyInfo": 0x013E, // updated 4.5
 	"FreeCompanyUpdateShortMessage": 0x0157, // added 5.0
 	"StatusEffectList":              0x015B, // updated 5.0
 	"EurekaStatusEffectList":        0x015C, // updated 5.0
@@ -115,7 +119,8 @@ var ServerZoneIpcTypeKR = map[string]uint16{
 	"CharaNameReq":                  0x0198, // updated 5.0
 	// nb: see #565 on github
 	"UpdateRetainerItemSalePrice": 0x019F, // updated 5.0
-	//    SetLevelSync: 0x1186, // not updated for 4.4, not sure what it is anymore
+	"RetainerInformation":         0x0149, // updated 5.05
+	//    SetLevelSync": 0x1186, // not updated for 4.4, not sure what it is anymore
 	"ItemInfo":                   0x01A1, // updated 5.0
 	"ContainerInfo":              0x01A2, // updated 5.0
 	"InventoryTransactionFinish": 0x01A3, // updated 5.0
@@ -138,13 +143,13 @@ var ServerZoneIpcTypeKR = map[string]uint16{
 	"QuestCompleteList":          0x01D4, // updated 5.0
 	"QuestFinish":                0x01D5, // updated 5.0
 	"MSQTrackerComplete":         0x01D6, // updated 5.0
-	//    MSQTrackerProgress: 0xF1CD, // updated 4.5 ? this actually looks like the two opcodes have been combined, see #474
+	//    MSQTrackerProgress": 0xF1CD, // updated 4.5 ? this actually looks like the two opcodes have been combined, see #474
 	"QuestMessage":  0x01DE, // updated 5.0
 	"QuestTracker":  0x01E3, // updated 5.0
 	"Mount":         0x01F3, // updated 5.0
 	"DirectorVars":  0x01F5, // updated 5.0
 	"DirectorPopUp": 0x0200, // updated 5.0 - display dialogue pop-ups in duties and FATEs, for example, Teraflare's countdown
-	//    CFAvailableContents: 0xF1FD, // updated 4.2
+	//    CFAvailableContents": 0xF1FD, // updated 4.2
 	"WeatherChange":     0x0210, // updated 5.0
 	"PlayerTitleList":   0x0211, // updated 5.0
 	"Discovery":         0x0212, // updated 5.0
@@ -166,33 +171,35 @@ var ServerZoneIpcTypeKR = map[string]uint16{
 	"HousingInternalObjectSpawn":   0x241,  // updated 5.0
 	"HousingWardInfo":              0x0243, // updated 5.0
 	"HousingObjectMove":            0x0244, // updated 5.0
-	//    SharedEstateSettingsResponse: 0x0245, // updated 4.5
-	//    LandUpdateHouseName: 0x0257, // updated 4.5
-	//    LandSetMap: 0x025B, // updated 4.5
+	//    SharedEstateSettingsResponse": 0x0245, // updated 4.5
+	//    LandUpdateHouseName": 0x0257, // updated 4.5
+	//    LandSetMap": 0x025B, // updated 4.5
 	//////////////////////////////////////////////////
-	//    DuelChallenge: 0x0277, // 4.2; this is responsible for opening the ui
-	//    PerformNote: 0x0286, // updated 4.3
+	//    DuelChallenge": 0x0277, // 4.2; this is responsible for opening the ui
+	//    PerformNote": 0x0286, // updated 4.3
 	"PrepareZoning": 0x02A4, // updated 5.0
-	//    ActorGauge: 0x0292, // updated 4.3
+	//    ActorGauge": 0x0292, // updated 4.3
 	//    // Unknown IPC types that still need to be sent
 	//    // TODO: figure all these out properly
 	//    // daily quest related, init seed and current quota probably
 	"DailyQuests":           0x025E, // updated 5.0
 	"DailyQuestRepeatFlags": 0x0260, // updated 5.0
 	/// Doman Mahjong //////////////////////////////////////
-	//    MahjongOpenGui: 0x02A4, // only available in mahjong instance
-	//    MahjongNextRound: 0x02BD, // initial hands(baipai), # of riichi(wat), winds, honba, score and stuff
-	//    MahjongPlayerAction: 0x02BE, // tsumo(as in drawing a tile) called chi/pon/kan/riichi
-	//    MahjongEndRoundTsumo: 0x02BF, // called tsumo
-	//    MahjongEndRoundRon: 0x2C0, // called ron or double ron (waiting for action must be flagged from discard packet to call)
-	//    MahjongTileDiscard: 0x02C1, // giri (discarding a tile.) chi(1)/pon(2)/kan(4)/ron(8) flags etc..
-	//    MahjongPlayersInfo: 0x02C2, // actor id, name, rating and stuff..
+	//    MahjongOpenGui": 0x02A4, // only available in mahjong instance
+	//    MahjongNextRound": 0x02BD, // initial hands(baipai), # of riichi(wat), winds, honba, score and stuff
+	//    MahjongPlayerAction": 0x02BE, // tsumo(as in drawing a tile) called chi/pon/kan/riichi
+	//    MahjongEndRoundTsumo": 0x02BF, // called tsumo
+	//    MahjongEndRoundRon": 0x2C0, // called ron or double ron (waiting for action must be flagged from discard packet to call)
+	//    MahjongTileDiscard": 0x02C1, // giri (discarding a tile.) chi(1)/pon(2)/kan(4)/ron(8) flags etc..
+	//    MahjongPlayersInfo": 0x02C2, // actor id, name, rating and stuff..
 	//    // 2C3 and 2C4 are currently unknown
-	//    MahjongEndRoundDraw: 0x02C5, // self explanatory
-	//    MahjongEndGame: 0x02C6, // finished oorasu(all-last) round; shows a result screen.
+	//    MahjongEndRoundDraw": 0x02C5, // self explanatory
+	//    MahjongEndGame": 0x02C6, // finished oorasu(all-last) round; shows a result screen.
 }
 
-// ClientZoneIpcTypeKR - Client IPC Zone Type Codes.
+/**
+* Client IPC Zone Type Codes.
+ */
 var ClientZoneIpcTypeKR = map[string]uint16{
 	"PingHandler":          0x0065, // unchanged 5.0
 	"InitHandler":          0x0066, // unchanged 5.0
@@ -203,9 +210,9 @@ var ClientZoneIpcTypeKR = map[string]uint16{
 	"PlayTimeHandler":      0x0073, // unchanged 5.0
 	"LogoutHandler":        0x0074, // unchanged 5.0
 	"CancelLogout":         0x0075, // updated 5.0
-	//    CFDutyInfoHandler: 0x0078, // updated 4.2
-	//    SocialReqSendHandler: 0x00AE, // updated 4.1
-	//    CreateCrossWorldLS: 0x00AF, // updated 4.3
+	//    CFDutyInfoHandler": 0x0078, // updated 4.2
+	//    SocialReqSendHandler": 0x00AE, // updated 4.1
+	//    CreateCrossWorldLS": 0x00AF, // updated 4.3
 	"ChatHandler":                    0x00D9, // updated 5.0
 	"SocialListHandler":              0x00E1, // updated 5.0
 	"SetSearchInfoHandler":           0x00E4, // updated 5.0
@@ -215,21 +222,21 @@ var ClientZoneIpcTypeKR = map[string]uint16{
 	"BlackListHandler":               0x00F2, // updated 5.0
 	"PlayerSearchHandler":            0x00F4, // updated 5.0
 	"LinkshellListHandler":           0x00FA, // updated 5.0
-	//    MarketBoardRequestItemListingInfo: 0x0102, // updated 4.5
-	//    MarketBoardRequestItemListings: 0x0103, // updated 4.5
-	//    MarketBoardSearch: 0x0107, // updated 4.5
-	//    ReqExamineFcInfo: 0x0113, // updated 4.1
-	//    FcInfoReqHandler: 0x011A, // updated 4.2
+	//    MarketBoardRequestItemListingInfo": 0x0102, // updated 4.5
+	//    MarketBoardRequestItemListings": 0x0103, // updated 4.5
+	//    MarketBoardSearch": 0x0107, // updated 4.5
+	//    ReqExamineFcInfo": 0x0113, // updated 4.1
+	//    FcInfoReqHandler": 0x011A, // updated 4.2
 	"FreeCompanyUpdateShortMessageHandler": 0x0123, // added 5.0
-	//    ReqMarketWishList: 0x012C, // updated 4.3
-	//    ReqJoinNoviceNetwork: 0x0129, // updated 4.2
-	//    ReqCountdownInitiate: 0x0133, // updated 4.5
-	//    ReqCountdownCancel: 0x0134, // updated 4.5
-	//    ClearWaymarks: 0x0135, // updated 4.5
+	//    ReqMarketWishList": 0x012C, // updated 4.3
+	//    ReqJoinNoviceNetwork": 0x0129, // updated 4.2
+	//    ReqCountdownInitiate": 0x0133, // updated 4.5
+	//    ReqCountdownCancel": 0x0134, // updated 4.5
+	//    ClearWaymarks": 0x0135, // updated 4.5
 	"ZoneLineHandler":  0x0139, // updated 5.0
 	"ClientTrigger":    0x013A, // updated 5.0
 	"DiscoveryHandler": 0x013B, // updated 5.0
-	//    AddWaymark: 0x013A, // updated 4.5
+	//    AddWaymark": 0x013A, // updated 4.5
 	"SkillHandler":            0x013D, // updated 5.0
 	"GMCommand1":              0x013E, // updated 5.0
 	"GMCommand2":              0x013F, // updated 5.0
@@ -246,28 +253,31 @@ var ClientZoneIpcTypeKR = map[string]uint16{
 	"ShopEventHandler":        0x0156, // updated 5.0
 	"ReturnEventHandler":      0x015A, // updated 5.0?
 	"TradeReturnEventHandler": 0x015B, // updated 5.0?
-	//    LinkshellEventHandler: 0x016B, // updated 4.5
-	//    LinkshellEventHandler1: 0x016C, // updated 4.5
+	//    LinkshellEventHandler": 0x016B, // updated 4.5
+	//    LinkshellEventHandler1": 0x016C, // updated 4.5
 	"ReqEquipDisplayFlagsChange":  0x0175, // updated 5.0
 	"LandRenameHandler":           0x0177, // updated 5.0
 	"HousingUpdateHouseGreeting":  0x0178, // updated 5.0
 	"HousingUpdateObjectPosition": 0x0179, // updated 5.0
 	"SetSharedEstateSettings":     0x017B, // updated 5.0
 	"UpdatePositionInstance":      0x0180, // updated 5.0
-	//    PerformNoteHandler: 0x029B, // updated 4.3
+	//    PerformNoteHandler": 0x029B, // updated 4.3
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Chat Connection IPC Codes
-
-// ServerChatIpcTypeKR - Server IPC Chat Type Codes.
+/**
+* Server IPC Chat Type Codes.
+ */
 var ServerChatIpcTypeKR = map[string]uint16{
-	//    Tell: 0x0064, // updated for sb
+	//    Tell": 0x0064, // updated for sb
 	"TellErrNotFound":  0x0066,
 	"FreeCompanyEvent": 0x012C, // added 5.0
 }
 
-// ClientChatIpcTypeKR - Client IPC Chat Type Codes.
+/**
+* Client IPC Chat Type Codes.
+ */
 var ClientChatIpcTypeKR = map[string]uint16{
 	"TellReq": 0x0064,
 }
