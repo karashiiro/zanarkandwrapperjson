@@ -64,9 +64,9 @@ func towerOfBabelSwitchEdition(packetType string) interface{} {
 	case "MailLetterNotification":
 		return new(sapphire.MailLetterNotification)
 	case "FMarketTaxRates":
-		return new(sapphire.FMarketTaxRates)
+		return new(sapphire.MarketTaxRates)
 	case "FMarketBoardItemListingCount":
-		return new(sapphire.FMarketBoardItemListingCount)
+		return new(sapphire.MarketBoardItemListingCount)
 	case "MarketBoardItemListing":
 		return new(sapphire.MarketBoardItemListing)
 	case "MarketBoardItemListingHistory":
@@ -273,6 +273,8 @@ func towerOfBabelSwitchEdition(packetType string) interface{} {
 		return new(sapphire.ObjectDespawn)
 	case "DuelChallenge":
 		return new(sapphire.DuelChallenge)
+	case "RetainerInformation":
+		return new(sapphire.RetainerInformation)
 	// ClientZoneDef.h
 	case "GmCommand1":
 		return new(sapphire.GmCommand1)

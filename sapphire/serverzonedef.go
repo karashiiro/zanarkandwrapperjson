@@ -244,7 +244,7 @@ type MailLetterNotification struct {
 	Unk2          [0x4]byte // This has probs something to do with the support desk (inquiry id?)
 }
 
-type FMarketTaxRates struct {
+type MarketTaxRates struct {
 	Unknown1 uint32
 	Padding1 uint16
 	Unknown2 uint16
@@ -252,7 +252,7 @@ type FMarketTaxRates struct {
 	Unknown3 uint64
 }
 
-type FMarketBoardItemListingCount struct {
+type MarketBoardItemListingCount struct {
 	ItemCatalogId uint32
 	Unknown1      uint32 // does some shit if nonzero
 	RequestId     uint16
@@ -1954,4 +1954,23 @@ type DuelChallenge struct {
 	OtherActorId uint32
 
 	OtherName [32]byte
+}
+
+type RetainerInformation struct {
+	Unknown1         uint64   /* 0x00 */
+	RetainerId       uint32   /* 0x08 */
+	Unknown2         uint32   /* 0x0C */
+	HireOrder        byte     /* 0x10 */
+	ItemCount        byte     /* 0x11 */
+	Unknown3         uint16   /* 0x12 */
+	Gil              uint32   /* 0x14 */
+	ItemSellingCount byte     /* 0x18 */
+	CityId           byte     /* 0x19 */
+	ClassJobId       byte     /* 0x1A */
+	Level            byte     /* 0x1B */
+	Unknown4         uint32   /* 0x1C */
+	VentureId        uint32   /* 0x20 */
+	VentureComplete  uint32   /* 0x24 */
+	Padding1         byte     /* 0x28 */
+	Name             [32]byte /* 0x29 */
 }

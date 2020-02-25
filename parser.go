@@ -54,7 +54,7 @@ func serializePackout(ipcStructure *IpcStructure, port uint16) {
 	buf.Write(bytes)
 	_, err := http.Post("http://localhost:"+fmt.Sprint(port), "application/json", &buf)
 	if err != nil {
-		log.Println(err)
+		log.Println(&buf)
 	}
 }
 
