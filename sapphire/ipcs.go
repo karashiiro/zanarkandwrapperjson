@@ -41,9 +41,9 @@ var ServerZoneIpcType = map[string]uint16{
 	"InitZone":       0x033A, // updated 5.2
 
 	"EffectResult":       0x0340, // updated 5.2
-	"ActorControl":       0x01E1, // updated 5.2
-	"ActorControlSelf":   0x010E, // updated 5.2
-	"ActorControlTarget": 0x00AE, // updated 5.2
+	"ActorControl":       0x0246, // updated 5.21
+	"ActorControlSelf":   0x02D1, // updated 5.21
+	"ActorControlTarget": 0x02FB, // updated 5.21
 
 	/*!
 	* @brief Used when resting
@@ -324,7 +324,7 @@ var ClientZoneIpcType = map[string]uint16{
 	//ReqCountdownCancel": 0x0136, // updated 5.0
 
 	"ZoneLineHandler": 0x00B9, // updated 5.2
-	"ClientTrigger":   0x017C, // updated 5.2
+	"ClientTrigger":   0x01A0, // updated 5.21
 	//DiscoveryHandler": 0x017B, // updated 5.18
 
 	//PlaceFieldMarker": 0x013C, // updated 5.0

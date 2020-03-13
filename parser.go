@@ -53,7 +53,7 @@ func serializePackout(ipcStructure *IpcStructure, port uint16) {
 	bytes, _ = json.Marshal(ipcStructure)
 	buf.Write(bytes)
 	_, err := http.Post("http://localhost:"+fmt.Sprint(port), "application/json", &buf)
-	if err != nil {
+	if err != nil && ipcStructure.Opcode == actorControl || ipcStructure.Opcode == actorControlSelf || ipcStructure.Opcode == actorControlTarget || ipcStructure.Opcode == clientTrigger {
 		log.Println(&buf)
 	}
 }
