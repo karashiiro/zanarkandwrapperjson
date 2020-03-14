@@ -437,11 +437,11 @@ type ActorControlSelf struct {
 	/* 0002 */ Padding uint16
 	/* 0004 */ Param1 uint32
 	/* 0008 */ Param2 uint32
-	/* 000C */ param3 uint32
+	/* 000C */ Param3 uint32
 	/* 0010 */ Param4 uint32
 	/* 0014 */ Param5 uint32
 	/* 0018 */ Param6 uint32
-	/* 0018 */ Padding1 uint32
+	/* 001C */ Padding1 uint32
 }
 
 /**

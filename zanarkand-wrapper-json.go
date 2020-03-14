@@ -93,6 +93,7 @@ func goLikeMain() int {
 			case "kill":
 				return 0
 			case "start":
+				log.Println("Starting sniff job.")
 				go subscriber.Subscribe(sniffer)
 			case "stop":
 				if sniffer.Active() {
