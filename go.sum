@@ -3,6 +3,8 @@ github.com/ayyaruq/zanarkand v0.0.0-20200126100816-9001c1a6ea94/go.mod h1:Ofy3u8
 github.com/ayyaruq/zanarkand v0.0.0-20200129065036-ffe0eef7ebf2 h1:hzja1cx9i4OutGjrICfJD06m3bgP2aDTptpG3CIe8Xk=
 github.com/ayyaruq/zanarkand v0.0.0-20200201123054-65094edb74d0 h1:Cjc/M/uYaUjHF+79bqaSSVaineQYgVco6UWKAjCcRBo=
 github.com/ayyaruq/zanarkand v0.0.0-20200201123054-65094edb74d0/go.mod h1:Ofy3u81vl49AuYq+ICdtryOqLn78tCLuxvXyfmyFz5I=
+github.com/ayyaruq/zanarkand v0.0.0-20200314070904-768a72a80b47 h1:JAgBk4gGeB0ZavVyRPzAJdFd3+LOOgL2p/haPIGIxPQ=
+github.com/ayyaruq/zanarkand v0.0.0-20200314070904-768a72a80b47/go.mod h1:Ofy3u81vl49AuYq+ICdtryOqLn78tCLuxvXyfmyFz5I=
 github.com/google/gopacket v1.1.17 h1:rMrlX2ZY2UbvT+sdz3+6J+pp2z+msCq9MxTU6ymxbBY=
 github.com/google/gopacket v1.1.17/go.mod h1:UdDNZ1OO62aGYVnPhxT1U6aI7ukYtA/kB8vaU0diBUM=
 golang.org/x/crypto v0.0.0-20190308221718-c2843e01d9a2/go.mod h1:djNgcEr1/C05ACkg1iLfiJU5Ep61QUkGW8qpdssI0+w=

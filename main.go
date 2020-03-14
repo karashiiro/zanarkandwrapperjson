@@ -70,7 +70,7 @@ func goLikeMain() int {
 	}
 
 	// Initialize a sniffer on the network device
-	sniffer, err := zanarkand.NewSniffer("", netIfaces[netIfaceIdx])
+	sniffer, err := zanarkand.NewSniffer("pcap", netIfaces[netIfaceIdx])
 	if err != nil {
 		log.Fatal(err)
 		return 1
@@ -78,7 +78,7 @@ func goLikeMain() int {
 
 	// Cleanly shutdown when we feel like it
 	defer func(sniffer *zanarkand.Sniffer) {
-		if sniffer.Active() {
+		if sniffer.Active {
 			sniffer.Stop()
 			time.Sleep(500) // time to drain
 		}
@@ -97,7 +97,7 @@ func goLikeMain() int {
 				log.Println("Starting sniff job.")
 				go subscriber.Subscribe(sniffer)
 			case "stop":
-				if sniffer.Active() {
+				if sniffer.Active {
 					sniffer.Stop()
 				}
 			default:
