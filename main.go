@@ -24,6 +24,7 @@ func goLikeMain() int {
 	port := flag.Uint64("-Port", 13346, "Sets the port for the IPC connection between this application and Node.js.")
 	networkDevice := net.ParseIP(*flag.String("-LocalIP", "", "Specifies a network to capture traffic on."))
 	isDev := flag.Bool("-Dev", false, "Sets the developer mode, enabling raw data output.")
+	flag.Parse()
 
 	// Setup our control mechanism
 	commander := make(chan string)
