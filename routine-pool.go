@@ -47,6 +47,6 @@ func readPool(pool *sync.Pool, region *string, port *uint16, isDev *bool) {
 		if message == nil {
 			continue
 		}
-		go parseMessage(message, region, port, isDev)
+		parseMessage(message, region, port, isDev)
 	}
 }
