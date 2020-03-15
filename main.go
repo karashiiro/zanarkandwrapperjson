@@ -86,6 +86,14 @@ func goLikeMain() int {
 
 	subscriber := zanarkand.NewGameEventSubscriber()
 
+	// Start thread pools
+	port16 := uint16(*port)
+	go readPool(&ServerZonePool, region, &port16, isDev)
+	go readPool(&ClientZonePool, region, &port16, isDev)
+	go readPool(&LobbyPool, region, &port16, isDev)
+	go readPool(&ChatPool, region, &port16, isDev)
+	go readPool(&UnknownPool, region, &port16, isDev)
+
 	// Control loop
 	for {
 		select {
@@ -104,7 +112,21 @@ func goLikeMain() int {
 				log.Println("Unknown command recieved: \"", command, "\"")
 			}
 		case message := <-subscriber.Events:
-			go parseMessage(message, *region, uint16(*port), *isDev)
+			if _, ok := ServerZoneIpcType[message.Opcode]; ok {
+				ServerZonePool.Put(message)
+			} else if _, ok := ClientZoneIpcType[message.Opcode]; ok {
+				ClientZonePool.Put(message)
+			} else if _, ok := ServerLobbyIpcType[message.Opcode]; ok {
+				LobbyPool.Put(message)
+			} else if _, ok := ClientLobbyIpcType[message.Opcode]; ok {
+				LobbyPool.Put(message)
+			} else if _, ok := ServerChatIpcType[message.Opcode]; ok {
+				ChatPool.Put(message)
+			} else if _, ok := ClientChatIpcType[message.Opcode]; ok {
+				ChatPool.Put(message)
+			} else {
+				UnknownPool.Put(message)
+			}
 		}
 	}
 }

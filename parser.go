@@ -20,12 +20,12 @@ var actorControlTarget uint16 = sapphire.ServerZoneIpcType["ActorControlTarget"]
 var clientTrigger uint16 = sapphire.ClientZoneIpcType["ClientTrigger"]
 
 // Cast the message data to a packet structure
-func parseMessage(message *zanarkand.GameEventMessage, region string, port uint16, isDev bool) {
+func parseMessage(message *zanarkand.GameEventMessage, region *string, port *uint16, isDev *bool) {
 	ipcStructure := new(IpcStructure)
 	ipcStructure.GameEventMessage = *message
-	ipcStructure.Region = region
+	ipcStructure.Region = *region
 
-	ipcStructure.Type = getPacketType(message.Opcode, region)
+	ipcStructure.Type = getPacketType(message.Opcode, *region)
 
 	ipcStructure.IpcParameters = marshalType(ipcStructure.Type, ipcStructure.Body)
 
@@ -39,7 +39,7 @@ func parseMessage(message *zanarkand.GameEventMessage, region string, port uint1
 		ipcStructure.SubType = jsifyString(ClientTriggerType[binary.LittleEndian.Uint16(message.Body[0:2])])
 	}
 
-	if !isDev {
+	if !*isDev {
 		ipcStructure.Body = make([]byte, 0)
 	}
 
@@ -47,12 +47,12 @@ func parseMessage(message *zanarkand.GameEventMessage, region string, port uint1
 }
 
 // *Serialize* the *pack*et and send it *out* over the network
-func serializePackout(ipcStructure *IpcStructure, port uint16) {
+func serializePackout(ipcStructure *IpcStructure, port *uint16) {
 	var buf bytes.Buffer
 	var bytes []byte
 	bytes, _ = json.Marshal(ipcStructure)
 	buf.Write(bytes)
-	_, err := http.Post("http://localhost:"+fmt.Sprint(port), "application/json", &buf)
+	_, err := http.Post("http://localhost:"+fmt.Sprint(*port), "application/json", &buf)
 	if err != nil && ipcStructure.Opcode == actorControl || ipcStructure.Opcode == actorControlSelf || ipcStructure.Opcode == actorControlTarget || ipcStructure.Opcode == clientTrigger {
 		log.Println(&buf)
 	}
