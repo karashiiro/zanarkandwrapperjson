@@ -1,15 +1,18 @@
 package main
 
 import (
+	"bytes"
+	"encoding/binary"
+
 	"github.com/karashiiro/ZanarkandWrapperJSON/sapphire"
 )
 
 // marshalType - Marshal an []byte to a packet structure
 func marshalType(packetType string, data []byte) interface{} {
-	//generic := towerOfBabelSwitchEdition(packetType)
+	generic := towerOfBabelSwitchEdition(packetType)
 
-	//buf := bytes.NewReader(data)
-	//binary.Read(buf, binary.LittleEndian, generic)
+	buf := bytes.NewReader(data)
+	binary.Read(buf, binary.LittleEndian, generic)
 
 	return new(interface{})
 }

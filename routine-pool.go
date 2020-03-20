@@ -7,38 +7,24 @@ import (
 )
 
 // ServerZonePool has water.
-var ServerZonePool = sync.Pool{
-	New: func() interface{} {
-		return nil
-	},
-}
+var ServerZonePool = sync.Pool{}
 
 // ClientZonePool has water.
-var ClientZonePool = sync.Pool{
-	New: func() interface{} {
-		return nil
-	},
-}
+var ClientZonePool = sync.Pool{}
 
 // LobbyPool has less-sanitary water.
-var LobbyPool = sync.Pool{
-	New: func() interface{} {
-		return nil
-	},
-}
+var LobbyPool = sync.Pool{}
 
 // ChatPool has water.
-var ChatPool = sync.Pool{
-	New: func() interface{} {
-		return nil
-	},
-}
+var ChatPool = sync.Pool{}
 
 // UnknownPool has muck.
-var UnknownPool = sync.Pool{
-	New: func() interface{} {
-		return nil
-	},
+var UnknownPool = sync.Pool{}
+
+func spawnThreads(pool *sync.Pool, count int, region *string, port *uint16, isDev *bool) {
+	for i := 0; i < count; i++ {
+		go readPool(pool, region, port, isDev)
+	}
 }
 
 func readPool(pool *sync.Pool, region *string, port *uint16, isDev *bool) {

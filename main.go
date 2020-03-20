@@ -88,11 +88,12 @@ func goLikeMain() int {
 
 	// Start thread pools
 	port16 := uint16(*port)
-	go readPool(&ServerZonePool, region, &port16, isDev)
-	go readPool(&ClientZonePool, region, &port16, isDev)
-	go readPool(&LobbyPool, region, &port16, isDev)
-	go readPool(&ChatPool, region, &port16, isDev)
-	go readPool(&UnknownPool, region, &port16, isDev)
+	threadCount := 4 // goroutine count per pool
+	go spawnThreads(&ServerZonePool, threadCount, region, &port16, isDev)
+	go spawnThreads(&ClientZonePool, threadCount, region, &port16, isDev)
+	go spawnThreads(&LobbyPool, threadCount, region, &port16, isDev)
+	go spawnThreads(&ChatPool, threadCount, region, &port16, isDev)
+	go spawnThreads(&UnknownPool, threadCount, region, &port16, isDev)
 
 	// Control loop
 	for {
@@ -102,14 +103,14 @@ func goLikeMain() int {
 			case "kill":
 				return 0
 			case "start":
-				log.Println("Starting sniff job.")
+				log.Println("Starwting sniwff jowb.")
 				go subscriber.Subscribe(sniffer)
 			case "stop":
 				if sniffer.Active {
 					sniffer.Stop()
 				}
 			default:
-				log.Println("Unknown command recieved: \"", command, "\"")
+				log.Println("Uwnknown cowmmawnd wecieved: \"", command, "\"")
 			}
 		case message := <-subscriber.Events:
 			if _, ok := ServerZoneIpcType[message.Opcode]; ok {
