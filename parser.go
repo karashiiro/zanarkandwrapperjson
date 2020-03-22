@@ -93,22 +93,28 @@ func getPacketType(opcode uint16, region string, isDirectionEgress bool) string 
 func switchRegion(region string) {
 	sapphire.LoadOpcodes(region)
 
-	actorControl = 0xFFFF
-	actorControlSelf = 0xFFFF
-	actorControlTarget = 0xFFFF
-	clientTrigger = 0xFFFF
-
 	if queryActorControl, ok := sapphire.ServerZoneIpcType.Keys["ActorControl"]; ok {
 		actorControl = queryActorControl
+	} else {
+		actorControl = 0xFFFF
 	}
+
 	if queryActorControlSelf, ok := sapphire.ServerZoneIpcType.Keys["ActorControlSelf"]; ok {
 		actorControlSelf = queryActorControlSelf
+	} else {
+		actorControlSelf = 0xFFFF
 	}
+
 	if queryActorControlTarget, ok := sapphire.ServerZoneIpcType.Keys["ActorControlTarget"]; ok {
 		actorControlTarget = queryActorControlTarget
+	} else {
+		actorControlTarget = 0xFFFF
 	}
+
 	if queryClientTrigger, ok := sapphire.ClientZoneIpcType.Keys["ClientTrigger"]; ok {
 		clientTrigger = queryClientTrigger
+	} else {
+		clientTrigger = 0xFFFF
 	}
 }
 
