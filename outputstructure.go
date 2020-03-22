@@ -5,6 +5,7 @@ import "github.com/ayyaruq/zanarkand"
 // IpcStructure - Struct of fields IPC packets can have
 type IpcStructure struct {
 	zanarkand.GameEventMessage
+	Direction string `json:"direction"`
 	Region    string `json:"region"`
 	SubType   string `json:"subType"`
 	SuperType string `json:"superType"`

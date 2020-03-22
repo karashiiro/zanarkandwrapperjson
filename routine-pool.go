@@ -12,27 +12,36 @@ var ServerZonePool = sync.Pool{}
 // ClientZonePool has water.
 var ClientZonePool = sync.Pool{}
 
-// LobbyPool has less-sanitary water.
-var LobbyPool = sync.Pool{}
+// ServerLobbyPool has less-sanitary water.
+var ServerLobbyPool = sync.Pool{}
 
-// ChatPool has water.
-var ChatPool = sync.Pool{}
+// ClientLobbyPool has less-sanitary water.
+var ClientLobbyPool = sync.Pool{}
 
-// UnknownPool has muck.
-var UnknownPool = sync.Pool{}
+// ServerChatPool has water.
+var ServerChatPool = sync.Pool{}
 
-func spawnThreads(pool *sync.Pool, count int, region *string, port *uint16, isDev *bool) {
+// ClientChatPool has water.
+var ClientChatPool = sync.Pool{}
+
+// ServerUnknownPool has muck.
+var ServerUnknownPool = sync.Pool{}
+
+// ClientUnknownPool has muck.
+var ClientUnknownPool = sync.Pool{}
+
+func spawnThreads(pool *sync.Pool, count int, region *string, port *uint16, isDirectionEgress bool, isDev *bool) {
 	for i := 0; i < count; i++ {
-		go readPool(pool, region, port, isDev)
+		go readPool(pool, region, port, isDirectionEgress, isDev)
 	}
 }
 
-func readPool(pool *sync.Pool, region *string, port *uint16, isDev *bool) {
+func readPool(pool *sync.Pool, region *string, port *uint16, isDirectionEgress bool, isDev *bool) {
 	for {
 		message := pool.Get().(*zanarkand.GameEventMessage)
 		if message == nil {
 			continue
 		}
-		parseMessage(message, region, port, isDev)
+		parseMessage(message, region, port, isDirectionEgress, isDev)
 	}
 }

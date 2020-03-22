@@ -12,6 +12,7 @@ import (
 
 	"github.com/ayyaruq/zanarkand"
 	"github.com/ayyaruq/zanarkand/devices"
+	"github.com/karashiiro/ZanarkandWrapperJSON/sapphire"
 )
 
 func main() {
@@ -89,48 +90,60 @@ func goLikeMain() int {
 	// Start thread pools
 	port16 := uint16(*port)
 	threadCount := 4 // goroutine count per pool
-	go spawnThreads(&ServerZonePool, threadCount, region, &port16, isDev)
-	go spawnThreads(&ClientZonePool, threadCount, region, &port16, isDev)
-	go spawnThreads(&LobbyPool, threadCount, region, &port16, isDev)
-	go spawnThreads(&ChatPool, threadCount, region, &port16, isDev)
-	go spawnThreads(&UnknownPool, threadCount, region, &port16, isDev)
+	go spawnThreads(&ServerZonePool, threadCount, region, &port16, false, isDev)
+	go spawnThreads(&ServerLobbyPool, threadCount, region, &port16, false, isDev)
+	go spawnThreads(&ServerChatPool, threadCount, region, &port16, false, isDev)
+	go spawnThreads(&ServerUnknownPool, threadCount, region, &port16, false, isDev)
+	go spawnThreads(&ClientZonePool, threadCount, region, &port16, true, isDev)
+	go spawnThreads(&ClientLobbyPool, threadCount, region, &port16, true, isDev)
+	go spawnThreads(&ClientChatPool, threadCount, region, &port16, true, isDev)
+	go spawnThreads(&ClientUnknownPool, threadCount, region, &port16, true, isDev)
 
 	// Control loop
 	for {
 		select {
-		case command := <-commander:
-			switch strings.Trim(command, "\n\r ") {
+		case input := <-commander:
+			args := strings.Split(" ", strings.Trim(input, "\n\r "))
+			command := args[0]
+			args = args[1:]
+			switch command {
 			case "kill":
 				return 0
 			case "start":
-				log.Println("Starwting sniwff jowb.")
+				log.Println("Starting sniff job.")
 				go subscriber.Subscribe(sniffer)
 			case "stop":
 				if sniffer.Active {
 					sniffer.Stop()
 				}
+			case "update":
+				log.Println("Downloading latest opcodes...")
+				sapphire.LoadOpcodes(*region)
+			case "switchregion":
+				log.Println("Switching region to ", args[0], ".")
+				sapphire.LoadOpcodes(args[0])
 			default:
-				log.Println("Uwnknown cowmmawnd wecieved: \"", command, "\"")
+				log.Println("Unknown command recieved: \"", command, "\"")
 			}
 		case message := <-subscriber.IngressEvents:
-			if _, ok := ServerZoneIpcType[message.Opcode]; ok {
+			if _, ok := sapphire.ServerZoneIpcType.Values[message.Opcode]; ok {
 				ServerZonePool.Put(message)
-			} else if _, ok := ServerLobbyIpcType[message.Opcode]; ok {
-				LobbyPool.Put(message)
-			} else if _, ok := ServerChatIpcType[message.Opcode]; ok {
-				ChatPool.Put(message)
+			} else if _, ok := sapphire.ServerLobbyIpcType.Values[message.Opcode]; ok {
+				ServerLobbyPool.Put(message)
+			} else if _, ok := sapphire.ServerChatIpcType.Values[message.Opcode]; ok {
+				ServerChatPool.Put(message)
 			} else {
-				UnknownPool.Put(message)
+				ServerUnknownPool.Put(message)
 			}
 		case message := <-subscriber.EgressEvents:
-			if _, ok := ClientZoneIpcType[message.Opcode]; ok {
+			if _, ok := sapphire.ClientZoneIpcType.Values[message.Opcode]; ok {
 				ClientZonePool.Put(message)
-			} else if _, ok := ClientLobbyIpcType[message.Opcode]; ok {
-				LobbyPool.Put(message)
-			} else if _, ok := ClientChatIpcType[message.Opcode]; ok {
-				ChatPool.Put(message)
+			} else if _, ok := sapphire.ClientLobbyIpcType.Values[message.Opcode]; ok {
+				ClientLobbyPool.Put(message)
+			} else if _, ok := sapphire.ClientChatIpcType.Values[message.Opcode]; ok {
+				ClientChatPool.Put(message)
 			} else {
-				UnknownPool.Put(message)
+				ClientUnknownPool.Put(message)
 			}
 		}
 	}

@@ -14,18 +14,23 @@ import (
 	"github.com/karashiiro/ZanarkandWrapperJSON/sapphire"
 )
 
-var actorControl uint16 = sapphire.ServerZoneIpcType["ActorControl"]
-var actorControlSelf uint16 = sapphire.ServerZoneIpcType["ActorControlSelf"]
-var actorControlTarget uint16 = sapphire.ServerZoneIpcType["ActorControlTarget"]
-var clientTrigger uint16 = sapphire.ClientZoneIpcType["ClientTrigger"]
+var actorControl uint16 = sapphire.ServerZoneIpcType.Keys["ActorControl"]
+var actorControlSelf uint16 = sapphire.ServerZoneIpcType.Keys["ActorControlSelf"]
+var actorControlTarget uint16 = sapphire.ServerZoneIpcType.Keys["ActorControlTarget"]
+var clientTrigger uint16 = sapphire.ClientZoneIpcType.Keys["ClientTrigger"]
 
 // Cast the message data to a packet structure
-func parseMessage(message *zanarkand.GameEventMessage, region *string, port *uint16, isDev *bool) {
+func parseMessage(message *zanarkand.GameEventMessage, region *string, port *uint16, isDirectionEgress bool, isDev *bool) {
 	ipcStructure := new(IpcStructure)
 	ipcStructure.GameEventMessage = *message
 	ipcStructure.Region = *region
 
-	ipcStructure.Type = getPacketType(message.Opcode, *region)
+	ipcStructure.Type = getPacketType(message.Opcode, *region, isDirectionEgress)
+	if isDirectionEgress {
+		ipcStructure.Direction = "outbound"
+	} else {
+		ipcStructure.Direction = "inbound"
+	}
 
 	ipcStructure.IpcParameters = marshalType(ipcStructure.Type, ipcStructure.Body)
 
@@ -33,10 +38,10 @@ func parseMessage(message *zanarkand.GameEventMessage, region *string, port *uin
 
 	if message.Opcode == actorControl || message.Opcode == actorControlSelf || message.Opcode == actorControlTarget {
 		ipcStructure.SuperType = "actorControl"
-		ipcStructure.SubType = jsifyString(ActorControlType[binary.LittleEndian.Uint16(message.Body[0:2])])
+		ipcStructure.SubType = jsifyString(sapphire.ActorControlTypeReverse[binary.LittleEndian.Uint16(message.Body[0:2])])
 	} else if message.Opcode == clientTrigger {
 		ipcStructure.SuperType = "clientTrigger"
-		ipcStructure.SubType = jsifyString(ClientTriggerType[binary.LittleEndian.Uint16(message.Body[0:2])])
+		ipcStructure.SubType = jsifyString(sapphire.ClientTriggerTypeReverse[binary.LittleEndian.Uint16(message.Body[0:2])])
 	}
 
 	if !*isDev {
@@ -58,67 +63,53 @@ func serializePackout(ipcStructure *IpcStructure, port *uint16) {
 	}
 }
 
-func getPacketType(opcode uint16, region string) string {
+func getPacketType(opcode uint16, region string, isDirectionEgress bool) string {
 	var ipcType string
 	var ok bool
-	if region == "Global" {
-		ipcType, ok = ServerLobbyIpcType[opcode]
+	if isDirectionEgress {
+		ipcType, ok = sapphire.ServerZoneIpcType.Values[opcode]
 		if !ok {
-			ipcType, ok = ClientLobbyIpcType[opcode]
+			ipcType, ok = sapphire.ServerLobbyIpcType.Values[opcode]
 		}
 		if !ok {
-			ipcType, ok = ServerZoneIpcType[opcode]
+			ipcType, ok = sapphire.ServerChatIpcType.Values[opcode]
+		}
+	} else {
+		ipcType, ok = sapphire.ClientZoneIpcType.Values[opcode]
+		if !ok {
+			ipcType, ok = sapphire.ClientLobbyIpcType.Values[opcode]
 		}
 		if !ok {
-			ipcType, ok = ClientZoneIpcType[opcode]
-		}
-		if !ok {
-			ipcType, ok = ServerChatIpcType[opcode]
-		}
-		if !ok {
-			ipcType, ok = ClientChatIpcType[opcode]
-		}
-	} else if region == "CN" {
-		ipcType, ok = ServerLobbyIpcTypeCN[opcode]
-		if !ok {
-			ipcType, ok = ClientLobbyIpcTypeCN[opcode]
-		}
-		if !ok {
-			ipcType, ok = ServerZoneIpcTypeCN[opcode]
-		}
-		if !ok {
-			ipcType, ok = ClientZoneIpcTypeCN[opcode]
-		}
-		if !ok {
-			ipcType, ok = ServerChatIpcTypeCN[opcode]
-		}
-		if !ok {
-			ipcType, ok = ClientChatIpcTypeCN[opcode]
-		}
-	} else if region == "KR" {
-		ipcType, ok = ServerLobbyIpcTypeKR[opcode]
-		if !ok {
-			ipcType, ok = ClientLobbyIpcTypeKR[opcode]
-		}
-		if !ok {
-			ipcType, ok = ServerZoneIpcTypeKR[opcode]
-		}
-		if !ok {
-			ipcType, ok = ClientZoneIpcTypeKR[opcode]
-		}
-		if !ok {
-			ipcType, ok = ServerChatIpcTypeKR[opcode]
-		}
-		if !ok {
-			ipcType, ok = ClientChatIpcTypeKR[opcode]
+			ipcType, ok = sapphire.ClientChatIpcType.Values[opcode]
 		}
 	}
-
 	if !ok {
 		ipcType = "unknown"
 	}
 
 	return ipcType
+}
+
+func switchRegion(region string) {
+	sapphire.LoadOpcodes(region)
+
+	actorControl = 0xFFFF
+	actorControlSelf = 0xFFFF
+	actorControlTarget = 0xFFFF
+	clientTrigger = 0xFFFF
+
+	if queryActorControl, ok := sapphire.ServerZoneIpcType.Keys["ActorControl"]; ok {
+		actorControl = queryActorControl
+	}
+	if queryActorControlSelf, ok := sapphire.ServerZoneIpcType.Keys["ActorControlSelf"]; ok {
+		actorControlSelf = queryActorControlSelf
+	}
+	if queryActorControlTarget, ok := sapphire.ServerZoneIpcType.Keys["ActorControlTarget"]; ok {
+		actorControlTarget = queryActorControlTarget
+	}
+	if queryClientTrigger, ok := sapphire.ClientZoneIpcType.Keys["ClientTrigger"]; ok {
+		clientTrigger = queryClientTrigger
+	}
 }
 
 func jsifyString(str string) string {
