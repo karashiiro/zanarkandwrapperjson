@@ -1,2 +1,2 @@
-ZanarkandWrapperJSON.exe -assembly_memuse_log
+ZanarkandWrapperJSON.exe
 pause

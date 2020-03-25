@@ -38,10 +38,11 @@ func spawnThreads(pool *sync.Pool, count int, region *string, port *uint16, isDi
 
 func readPool(pool *sync.Pool, region *string, port *uint16, isDirectionEgress bool, isDev *bool) {
 	for {
-		message := pool.Get().(*zanarkand.GameEventMessage)
-		if message == nil {
+		nilable := pool.Get()
+		if nilable == nil {
 			continue
 		}
+		message := nilable.(*zanarkand.GameEventMessage)
 		parseMessage(message, region, port, isDirectionEgress, isDev)
 	}
 }
