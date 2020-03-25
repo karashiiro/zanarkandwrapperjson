@@ -24,8 +24,10 @@ func goLikeMain() int {
 	region := flag.String("-Region", "Global", "Sets the IPC version to Global/CN/KR.")
 	port := flag.Uint64("-Port", 13346, "Sets the port for the IPC connection between this application and Node.js.")
 	networkDevice := net.ParseIP(*flag.String("-LocalIP", "", "Specifies a network to capture traffic on."))
-	isDev := flag.Bool("-Dev", false, "Sets the developer mode, enabling raw data output.")
+	isDev := flag.Bool("-Dev", true, "Sets the developer mode, enabling raw data output.")
 	flag.Parse()
+
+	port16 := uint16(*port)
 
 	// Setup our control mechanism
 	commander := make(chan string)
@@ -87,18 +89,6 @@ func goLikeMain() int {
 
 	subscriber := zanarkand.NewGameEventSubscriber()
 
-	// Start thread pools
-	port16 := uint16(*port)
-	threadCount := 4 // goroutine count per pool
-	go spawnThreads(&ServerZonePool, threadCount, region, &port16, false, isDev)
-	go spawnThreads(&ServerLobbyPool, threadCount, region, &port16, false, isDev)
-	go spawnThreads(&ServerChatPool, threadCount, region, &port16, false, isDev)
-	go spawnThreads(&ServerUnknownPool, threadCount, region, &port16, false, isDev)
-	go spawnThreads(&ClientZonePool, threadCount, region, &port16, true, isDev)
-	go spawnThreads(&ClientLobbyPool, threadCount, region, &port16, true, isDev)
-	go spawnThreads(&ClientChatPool, threadCount, region, &port16, true, isDev)
-	go spawnThreads(&ClientUnknownPool, threadCount, region, &port16, true, isDev)
-
 	// Get opcodes
 	sapphire.LoadOpcodes(*region)
 
@@ -106,21 +96,22 @@ func goLikeMain() int {
 	for {
 		select {
 		case input := <-commander:
-			args := strings.Split(" ", strings.Trim(input, "\n\r "))
+			args := strings.Split(strings.Trim(input, "\n\r "), " ")
 			command := args[0]
 			args = args[1:]
 			switch command {
 			case "kill":
+				log.Println("Exiting application...")
 				return 0
 			case "start":
 				log.Println("Starting sniff job.")
 				go subscriber.Subscribe(sniffer)
 			case "stop":
 				if sniffer.Active {
+					log.Println("Stopping sniff job.")
 					sniffer.Stop()
 				}
 			case "update":
-				log.Println("Downloading latest opcodes...")
 				sapphire.LoadOpcodes(*region)
 			case "switchregion":
 				log.Println("Switching region to ", args[0], ".")
@@ -129,25 +120,9 @@ func goLikeMain() int {
 				log.Println("Unknown command recieved: \"", command, "\"")
 			}
 		case message := <-subscriber.IngressEvents:
-			if _, ok := sapphire.ServerZoneIpcType.Values[message.Opcode]; ok {
-				ServerZonePool.Put(message)
-			} else if _, ok := sapphire.ServerLobbyIpcType.Values[message.Opcode]; ok {
-				ServerLobbyPool.Put(message)
-			} else if _, ok := sapphire.ServerChatIpcType.Values[message.Opcode]; ok {
-				ServerChatPool.Put(message)
-			} else {
-				ServerUnknownPool.Put(message)
-			}
+			go parseMessage(message, region, &port16, false, isDev)
 		case message := <-subscriber.EgressEvents:
-			if _, ok := sapphire.ClientZoneIpcType.Values[message.Opcode]; ok {
-				ClientZonePool.Put(message)
-			} else if _, ok := sapphire.ClientLobbyIpcType.Values[message.Opcode]; ok {
-				ClientLobbyPool.Put(message)
-			} else if _, ok := sapphire.ClientChatIpcType.Values[message.Opcode]; ok {
-				ClientChatPool.Put(message)
-			} else {
-				ClientUnknownPool.Put(message)
-			}
+			go parseMessage(message, region, &port16, true, isDev)
 		}
 	}
 }

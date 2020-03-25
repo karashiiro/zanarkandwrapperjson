@@ -54,11 +54,10 @@ func parseMessage(message *zanarkand.GameEventMessage, region *string, port *uin
 // *Serialize* the *pack*et and send it *out* over the network
 func serializePackout(ipcStructure *IpcStructure, port *uint16) {
 	var buf bytes.Buffer
-	var bytes []byte
-	bytes, _ = json.Marshal(ipcStructure)
+	bytes, _ := json.Marshal(ipcStructure)
 	buf.Write(bytes)
 	_, err := http.Post("http://localhost:"+fmt.Sprint(*port), "application/json", &buf)
-	if err != nil && ipcStructure.Opcode == actorControl || ipcStructure.Opcode == actorControlSelf || ipcStructure.Opcode == actorControlTarget || ipcStructure.Opcode == clientTrigger {
+	if err != nil {
 		log.Println(&buf)
 	}
 }

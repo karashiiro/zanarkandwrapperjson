@@ -1,6 +1,8 @@
 package main
 
-import "github.com/ayyaruq/zanarkand"
+import (
+	"github.com/ayyaruq/zanarkand"
+)
 
 // IpcStructure - Struct of fields IPC packets can have
 type IpcStructure struct {
