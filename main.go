@@ -99,6 +99,9 @@ func goLikeMain() int {
 	go spawnThreads(&ClientChatPool, threadCount, region, &port16, true, isDev)
 	go spawnThreads(&ClientUnknownPool, threadCount, region, &port16, true, isDev)
 
+	// Get opcodes
+	sapphire.LoadOpcodes(*region)
+
 	// Control loop
 	for {
 		select {

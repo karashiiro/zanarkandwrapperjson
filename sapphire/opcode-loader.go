@@ -62,6 +62,15 @@ var dataSource = "https://raw.githubusercontent.com/karashiiro/FFXIVOpcodes/mast
 
 // LoadOpcodes loads opcodes from the source URL.
 func LoadOpcodes(region string) {
+	// Reset maps
+	ServerZoneIpcType.Keys = make(map[string]uint16)
+	ClientZoneIpcType.Keys = make(map[string]uint16)
+	ServerLobbyIpcType.Keys = make(map[string]uint16)
+	ClientLobbyIpcType.Keys = make(map[string]uint16)
+	ServerChatIpcType.Keys = make(map[string]uint16)
+	ClientChatIpcType.Keys = make(map[string]uint16)
+
+	// Download opcode JSON and marshal it
 	res, err := http.Get(dataSource)
 	if err != nil {
 		log.Fatalln(err)
@@ -76,6 +85,7 @@ func LoadOpcodes(region string) {
 		log.Fatalln(err)
 	}
 
+	// Load the opcodes
 	for _, val := range opcodes {
 		if val.Region == region {
 			for _, op := range val.Lists.ServerZoneIpcType {
@@ -99,6 +109,7 @@ func LoadOpcodes(region string) {
 		}
 	}
 
+	// Make the reversed versions
 	ServerZoneIpcType.Values = reverseMap(ServerZoneIpcType.Keys)
 	ClientZoneIpcType.Values = reverseMap(ClientZoneIpcType.Keys)
 	ServerLobbyIpcType.Values = reverseMap(ServerLobbyIpcType.Keys)
