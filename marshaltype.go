@@ -67,6 +67,8 @@ func getTypeIngress(packetType string) interface{} {
 		return new(sapphire.PlayerSpawn)
 	case "PlayerStats":
 		return new(sapphire.PlayerStats)
+	case "RetainerInformation":
+		return new(sapphire.RetainerInformation)
 	case "SomeDirectorUnk4":
 		return new(sapphire.SomeDirectorUnk4)
 	case "UpdateClassInfo":

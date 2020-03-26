@@ -673,6 +673,25 @@ type MarketBoardSearchResult struct {
 	RequestID         uint32 `json:"requestId"`
 }
 
+type RetainerInformation struct {
+	Unknown1         uint64   `json:"unknown1"`
+	RetainerID       uint32   `json:"retainerID"`
+	Unknown2         uint32   `json:"unknown2"`
+	HireOrder        uint8    `json:"hireOrder"`
+	ItemCount        uint8    `json:"itemCount"`
+	Unknown3         uint16   `json:"unknown3"`
+	Gil              uint32   `json:"gil"`
+	ItemSellingCount uint8    `json:"itemSellingCount"`
+	CityID           uint8    `json:"cityID"`
+	ClassJobID       uint8    `json:"classJobID"`
+	Level            uint32   `json:"level"`
+	Unknown4         uint32   `json:"unknown4"`
+	VentureID        uint32   `json:"ventureID"`
+	VentureComplete  uint32   `json:"ventureComplete"`
+	Padding          uint8    `json:"padding"`
+	Name             [32]byte `json:"name"`
+}
+
 type WeatherChange struct {
 	WeatherID uint32  `json:"weatherId"`
 	Delay     float32 `json:"delay"`
