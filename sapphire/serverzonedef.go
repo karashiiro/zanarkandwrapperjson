@@ -657,7 +657,7 @@ type MarketBoardItemListingHistory struct {
 		BuyerName [33]byte `json:"buyerName"`
 
 		ItemCatalogID uint32 `json:"itemCatalogId"`
-	}
+	} `json:"listing"`
 }
 
 type MarketBoardSearchResult struct {
@@ -665,7 +665,7 @@ type MarketBoardSearchResult struct {
 		ItemCatalogID uint32 `json:"itemCatalogId"`
 		Quantity      uint16 `json:"quantity"`
 		Demand        uint16 `json:"demand"`
-	}
+	} `json:"items"`
 
 	ListingIndexEnd   uint32 `json:"listingIndexEnd"`
 	Padding1          uint32 `json:"padding1"`
