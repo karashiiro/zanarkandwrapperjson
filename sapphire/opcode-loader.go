@@ -6,35 +6,29 @@ import (
 	"net/http"
 )
 
-// Bimap is a structure containing two maps, a by-key map and a by-value map
-type Bimap struct {
-	Keys   map[string]uint16
-	Values map[uint16]string
-}
-
 // ServerZoneIpcType contains opcode entries for commands executing in the currently-loaded zone, from the server.
-var ServerZoneIpcType Bimap
+var ServerZoneIpcType Bimap16
 
 // ClientZoneIpcType contains opcode entries for commands executing in the currently-loaded zone, from the client.
-var ClientZoneIpcType Bimap
+var ClientZoneIpcType Bimap16
 
 // ServerLobbyIpcType contains opcode entries for commands executing in the lobby, from the server.
-var ServerLobbyIpcType Bimap
+var ServerLobbyIpcType Bimap16
 
 // ClientLobbyIpcType contains opcode entries for commands executing in the lobby, from the client.
-var ClientLobbyIpcType Bimap
+var ClientLobbyIpcType Bimap16
 
 // ServerChatIpcType contains opcode entries for commands executing in chat, from the server.
-var ServerChatIpcType Bimap
+var ServerChatIpcType Bimap16
 
 // ClientChatIpcType contains opcode entries for commands executing in chat, from the client.
-var ClientChatIpcType Bimap
+var ClientChatIpcType Bimap16
 
 // ActorControlTypeReverse contains opcodes for actor controls, by value.
-var ActorControlTypeReverse = reverseMap(ActorControlType)
+var ActorControlTypeReverse = ReverseMap16(ActorControlType)
 
 // ClientTriggerTypeReverse contains opcodes for actor controls, by value.
-var ClientTriggerTypeReverse = reverseMap(ClientTriggerType)
+var ClientTriggerTypeReverse = ReverseMap16(ClientTriggerType)
 
 // OpcodeEntry has an opcode entry
 type OpcodeEntry struct {
@@ -58,22 +52,22 @@ type OpcodeRegion struct {
 	Lists  OpcodeLists `json:"lists"`
 }
 
-var dataSource = "https://raw.githubusercontent.com/karashiiro/FFXIVOpcodes/master/opcodes.min.json"
+var opcodeSource = "https://raw.githubusercontent.com/karashiiro/FFXIVOpcodes/master/opcodes.min.json"
 
 // LoadOpcodes loads opcodes from the source URL.
 func LoadOpcodes(region string) {
 	log.Println("Downloading latest opcodes...")
 
 	// Reset maps
-	ServerZoneIpcType.Keys = make(map[string]uint16)
-	ClientZoneIpcType.Keys = make(map[string]uint16)
-	ServerLobbyIpcType.Keys = make(map[string]uint16)
-	ClientLobbyIpcType.Keys = make(map[string]uint16)
-	ServerChatIpcType.Keys = make(map[string]uint16)
-	ClientChatIpcType.Keys = make(map[string]uint16)
+	ServerZoneIpcType.ByKeys = make(map[string]uint16)
+	ClientZoneIpcType.ByKeys = make(map[string]uint16)
+	ServerLobbyIpcType.ByKeys = make(map[string]uint16)
+	ClientLobbyIpcType.ByKeys = make(map[string]uint16)
+	ServerChatIpcType.ByKeys = make(map[string]uint16)
+	ClientChatIpcType.ByKeys = make(map[string]uint16)
 
 	// Download opcode JSON and marshal it
-	res, err := http.Get(dataSource)
+	res, err := http.Get(opcodeSource)
 	if err != nil {
 		log.Fatalln(err)
 	}
@@ -92,41 +86,33 @@ func LoadOpcodes(region string) {
 	for _, val := range opcodes {
 		if val.Region == region {
 			for _, op := range val.Lists.ServerZoneIpcType {
-				ServerZoneIpcType.Keys[op.Name] = op.Opcode
+				ServerZoneIpcType.ByKeys[op.Name] = op.Opcode
 			}
 			for _, op := range val.Lists.ClientZoneIpcType {
-				ClientZoneIpcType.Keys[op.Name] = op.Opcode
+				ClientZoneIpcType.ByKeys[op.Name] = op.Opcode
 			}
 			for _, op := range val.Lists.ServerLobbyIpcType {
-				ServerLobbyIpcType.Keys[op.Name] = op.Opcode
+				ServerLobbyIpcType.ByKeys[op.Name] = op.Opcode
 			}
 			for _, op := range val.Lists.ClientLobbyIpcType {
-				ClientLobbyIpcType.Keys[op.Name] = op.Opcode
+				ClientLobbyIpcType.ByKeys[op.Name] = op.Opcode
 			}
 			for _, op := range val.Lists.ServerChatIpcType {
-				ServerChatIpcType.Keys[op.Name] = op.Opcode
+				ServerChatIpcType.ByKeys[op.Name] = op.Opcode
 			}
 			for _, op := range val.Lists.ClientChatIpcType {
-				ClientChatIpcType.Keys[op.Name] = op.Opcode
+				ClientChatIpcType.ByKeys[op.Name] = op.Opcode
 			}
 		}
 	}
 
 	// Make the reversed versions
-	ServerZoneIpcType.Values = reverseMap(ServerZoneIpcType.Keys)
-	ClientZoneIpcType.Values = reverseMap(ClientZoneIpcType.Keys)
-	ServerLobbyIpcType.Values = reverseMap(ServerLobbyIpcType.Keys)
-	ClientLobbyIpcType.Values = reverseMap(ClientLobbyIpcType.Keys)
-	ServerChatIpcType.Values = reverseMap(ServerChatIpcType.Keys)
-	ClientChatIpcType.Values = reverseMap(ClientChatIpcType.Keys)
+	ServerZoneIpcType.ByValues = ReverseMap16(ServerZoneIpcType.ByKeys)
+	ClientZoneIpcType.ByValues = ReverseMap16(ClientZoneIpcType.ByKeys)
+	ServerLobbyIpcType.ByValues = ReverseMap16(ServerLobbyIpcType.ByKeys)
+	ClientLobbyIpcType.ByValues = ReverseMap16(ClientLobbyIpcType.ByKeys)
+	ServerChatIpcType.ByValues = ReverseMap16(ServerChatIpcType.ByKeys)
+	ClientChatIpcType.ByValues = ReverseMap16(ClientChatIpcType.ByKeys)
 
 	log.Println("Done!")
-}
-
-func reverseMap(m map[string]uint16) map[uint16]string {
-	flip := make(map[uint16]string)
-	for k, v := range m {
-		flip[v] = k
-	}
-	return flip
 }
