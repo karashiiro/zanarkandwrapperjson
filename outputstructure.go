@@ -6,7 +6,7 @@ import (
 	"github.com/ayyaruq/zanarkand"
 )
 
-// IpcStructure - Struct of fields IPC packets can have
+// IpcStructure - Struct of the fields that IPC packets can have
 type IpcStructure struct {
 	zanarkand.GameEventMessage
 	Direction string `json:"direction"`
@@ -34,16 +34,18 @@ func (ipc *IpcStructure) MarshalJSON() ([]byte, error) {
 		Region    string `json:"region"`
 		Timestamp int32  `json:"timestamp"`
 		Data      []int  `json:"data"`
+		IpcParameters
 	}{
-		Opcode:    ipc.Opcode,
-		Type:      ipc.Type,
-		SubType:   ipc.SubType,
-		SuperType: ipc.SuperType,
-		Direction: ipc.Direction,
-		ServerID:  ipc.ServerID,
-		Region:    ipc.Region,
-		Timestamp: int32(ipc.Timestamp.Unix()),
-		Data:      data,
+		Opcode:        ipc.Opcode,
+		Type:          ipc.Type,
+		SubType:       ipc.SubType,
+		SuperType:     ipc.SuperType,
+		Direction:     ipc.Direction,
+		ServerID:      ipc.ServerID,
+		Region:        ipc.Region,
+		Timestamp:     int32(ipc.Timestamp.Unix()),
+		Data:          data,
+		IpcParameters: ipc.IpcParameters,
 	})
 }
 

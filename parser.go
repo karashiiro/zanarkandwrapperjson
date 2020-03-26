@@ -54,12 +54,14 @@ func parseMessage(message *zanarkand.GameEventMessage, region *string, port *uin
 // *Serialize* the *pack*et and send it *out* over the network
 func serializePackout(ipcStructure *IpcStructure, port *uint16, isDev *bool) {
 	var buf bytes.Buffer
-	bytes, _ := json.Marshal(ipcStructure)
-	buf.Write(bytes)
+	stringBytes, _ := json.Marshal(ipcStructure)
+	buf.Write(stringBytes)
 	_, err := http.Post("http://localhost:"+fmt.Sprint(*port), "application/json", &buf)
 	if err != nil {
 		if *isDev {
-			log.Println(&buf)
+			if ipcStructure.Type == "actorControl" {
+				log.Println(&buf)
+			}
 		} else {
 			log.Println(err)
 		}
@@ -70,20 +72,20 @@ func getPacketType(opcode *uint16, region *string, isDirectionEgress *bool) stri
 	var ipcType string
 	var ok bool
 	if *isDirectionEgress {
-		ipcType, ok = sapphire.ServerZoneIpcType.ByValues[*opcode]
-		if !ok {
-			ipcType, ok = sapphire.ServerLobbyIpcType.ByValues[*opcode]
-		}
-		if !ok {
-			ipcType, ok = sapphire.ServerChatIpcType.ByValues[*opcode]
-		}
-	} else {
 		ipcType, ok = sapphire.ClientZoneIpcType.ByValues[*opcode]
 		if !ok {
 			ipcType, ok = sapphire.ClientLobbyIpcType.ByValues[*opcode]
 		}
 		if !ok {
 			ipcType, ok = sapphire.ClientChatIpcType.ByValues[*opcode]
+		}
+	} else {
+		ipcType, ok = sapphire.ServerZoneIpcType.ByValues[*opcode]
+		if !ok {
+			ipcType, ok = sapphire.ServerLobbyIpcType.ByValues[*opcode]
+		}
+		if !ok {
+			ipcType, ok = sapphire.ServerChatIpcType.ByValues[*opcode]
 		}
 	}
 	if !ok {

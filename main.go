@@ -92,6 +92,7 @@ func goLikeMain() int {
 	// Get resources
 	sapphire.LoadOpcodes(*region)
 	sapphire.LoadDynamicConstants(*region)
+	log.Println("Initialization complete!")
 
 	// Control loop
 	for {

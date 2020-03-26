@@ -29,7 +29,7 @@ func LoadDynamicConstants(region string) {
 	if err != nil {
 		log.Fatalln(err)
 	}
-	log.Println("Opcode store downloaded. Deserializing...")
+	log.Println("Constant store downloaded. Deserializing...")
 
 	defer res.Body.Close()
 
