@@ -89,8 +89,9 @@ func goLikeMain() int {
 
 	subscriber := zanarkand.NewGameEventSubscriber()
 
-	// Get opcodes
+	// Get resources
 	sapphire.LoadOpcodes(*region)
+	sapphire.LoadDynamicConstants(*region)
 
 	// Control loop
 	for {
@@ -113,9 +114,11 @@ func goLikeMain() int {
 				}
 			case "update":
 				sapphire.LoadOpcodes(*region)
+				sapphire.LoadDynamicConstants(*region)
 			case "switchregion":
 				log.Println("Switching region to ", args[0], ".")
 				sapphire.LoadOpcodes(args[0])
+				sapphire.LoadDynamicConstants(args[0])
 			default:
 				log.Println("Unknown command recieved: \"", command, "\"")
 			}
