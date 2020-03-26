@@ -7,16 +7,16 @@ import (
 	"github.com/karashiiro/ZanarkandWrapperJSON/sapphire"
 )
 
-// marshalType - Marshal an []byte to a packet structure
-func marshalType(packetType *string, data *[]byte, isDirectionEgress *bool) interface{} {
+// UnmarshalType - Unmarshal an []byte to a packet structure
+func (ipcStructure *IpcStructure) UnmarshalType() interface{} {
 	var generic interface{}
-	if *isDirectionEgress {
-		generic = getTypeEgress(*packetType)
+	if ipcStructure.IsEgressMessage {
+		generic = ipcStructure.GetTypeEgress()
 	} else {
-		generic = getTypeIngress(*packetType)
+		generic = ipcStructure.GetTypeIngress()
 	}
 
-	buf := bytes.NewReader(*data)
+	buf := bytes.NewReader(ipcStructure.Body)
 	if generic != new(interface{}) {
 		binary.Read(buf, binary.LittleEndian, generic)
 	}
@@ -24,8 +24,9 @@ func marshalType(packetType *string, data *[]byte, isDirectionEgress *bool) inte
 	return &generic
 }
 
-func getTypeIngress(packetType string) interface{} {
-	switch packetType {
+// GetTypeIngress returns an instance of the struct in the []byte of this package for inbound packets.
+func (ipcStructure *IpcStructure) GetTypeIngress() interface{} {
+	switch ipcStructure.Type {
 	// ServerZoneDef
 	case "ActorControl":
 		return new(sapphire.ActorControl)
@@ -89,8 +90,9 @@ func getTypeIngress(packetType string) interface{} {
 	return new(interface{})
 }
 
-func getTypeEgress(packetType string) interface{} {
-	switch packetType {
+// GetTypeEgress returns an instance of the struct in the []byte of this package for outbound packets.
+func (ipcStructure *IpcStructure) GetTypeEgress() interface{} {
+	switch ipcStructure.Type {
 	case "InventoryModifyHandler":
 		return new(sapphire.InventoryModifyHandler)
 	}

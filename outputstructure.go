@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"log"
+	"strings"
 
 	"github.com/ayyaruq/zanarkand"
 )
@@ -10,12 +11,13 @@ import (
 // IpcStructure - Struct of the fields that IPC packets can have
 type IpcStructure struct {
 	zanarkand.GameEventMessage
-	Direction string `json:"direction"`
-	Region    string `json:"region"`
-	SubType   string `json:"subType"`
-	SuperType string `json:"superType"`
-	Type      string `json:"type"`
-	IpcParameters
+	Direction       string `json:"direction"`
+	IsEgressMessage bool   `json:"-"`
+	Region          string `json:"region"`
+	SubType         string `json:"subType"`
+	SuperType       string `json:"superType"`
+	Type            string `json:"type"`
+	IpcMessageFields
 }
 
 // MarshalJSON overrides all child JSON serialization methods. Apparently there's a less redundant way to do this, but at the moment I don't care because it works.
@@ -37,9 +39,9 @@ func (ipc *IpcStructure) MarshalJSON() ([]byte, error) {
 		Data      []int  `json:"data"`
 	}{
 		Opcode:    ipc.Opcode,
-		Type:      ipc.Type,
-		SubType:   ipc.SubType,
-		SuperType: ipc.SuperType,
+		Type:      jsifyString(ipc.Type),
+		SubType:   jsifyString(ipc.SubType),
+		SuperType: jsifyString(ipc.SuperType),
 		Direction: ipc.Direction,
 		ServerID:  ipc.ServerID,
 		Region:    ipc.Region,
@@ -49,7 +51,7 @@ func (ipc *IpcStructure) MarshalJSON() ([]byte, error) {
 	if err != nil {
 		log.Println(err)
 	}
-	b2, err := json.Marshal(ipc.IpcParameters)
+	b2, err := json.Marshal(ipc.IpcMessageFields)
 	if err != nil {
 		log.Println(err)
 	}
@@ -61,5 +63,9 @@ func (ipc *IpcStructure) MarshalJSON() ([]byte, error) {
 	return []byte(s1 + ", " + s2), nil
 }
 
-// IpcParameters - Holds any IPC struct to be serialized later
-type IpcParameters interface{}
+func jsifyString(str string) string {
+	return strings.ToLower(str[0:1]) + str[1:]
+}
+
+// IpcMessageFields - Holds any IPC struct to be serialized later
+type IpcMessageFields interface{}

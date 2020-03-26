@@ -124,9 +124,9 @@ func goLikeMain() int {
 				log.Println("Unknown command recieved: \"", command, "\"")
 			}
 		case message := <-subscriber.IngressEvents:
-			go parseMessage(message, region, &port16, false, isDev)
+			go parseMessage(message, *region, port16, false, *isDev)
 		case message := <-subscriber.EgressEvents:
-			go parseMessage(message, region, &port16, true, isDev)
+			go parseMessage(message, *region, port16, true, *isDev)
 		}
 	}
 }
