@@ -2,9 +2,9 @@ package main
 
 import (
 	"encoding/json"
+	"log"
 	"strings"
 
-	dynamicstruct "github.com/Ompluscator/dynamic-struct"
 	"github.com/ayyaruq/zanarkand"
 )
 
@@ -27,7 +27,7 @@ func (ipc *IpcStructure) MarshalJSON() ([]byte, error) {
 		data[i] = int(b)
 	}
 
-	mainComponent := &struct {
+	b1, err := json.Marshal(&struct {
 		Opcode    uint16 `json:"opcode"`
 		Type      string `json:"type"`
 		SubType   string `json:"subType"`
@@ -47,14 +47,35 @@ func (ipc *IpcStructure) MarshalJSON() ([]byte, error) {
 		Region:    ipc.Region,
 		Timestamp: int32(ipc.Timestamp.Unix()),
 		Data:      data,
+	})
+	if err != nil {
+		log.Println(err) // shouldn't happen but might
+		return nil, err
 	}
 
-	mergedStruct := dynamicstruct.MergeStructs(mainComponent, ipc.IpcMessageFields).Build()
+	b2, err := json.Marshal(ipc.IpcMessageFields)
+	if err != nil {
+		log.Println(err)
+		return nil, err
+	}
 
-	return json.Marshal(mergedStruct)
+	// This whole string concatenation thing is gross in principle, but it's intuitive and works,
+	// as opposed to other things that don't work, like dynamicstruct (can't merge a struct with an interface)
+	// or json.Marshal overrides (the fields of the interface become an object under a new key rather than being embedded)
+	s1 := string(b1[:len(b1)-1])
+	s2 := string(b2[1:])
+	compositeJSON := s1 + ", " + s2
+	if s2 == "ull" { // "null" with the first rune chopped off
+		compositeJSON = string(b1)
+	}
+
+	return []byte(compositeJSON), nil
 }
 
 func jsifyString(str string) string {
+	if len(str) == 0 {
+		return str
+	}
 	return strings.ToLower(str[0:1]) + str[1:]
 }
 

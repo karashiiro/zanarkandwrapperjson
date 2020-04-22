@@ -97,14 +97,15 @@ func (ipcStructure *IpcStructure) IdentifyClientTrigger() {
 // SerializePackout - *Serialize* the *pack*et and send it *out* over the network.
 func (ipcStructure *IpcStructure) SerializePackout(port uint16, isDev bool) {
 	var buf bytes.Buffer
-	stringBytes, _ := json.Marshal(ipcStructure)
+	stringBytes, err := json.Marshal(ipcStructure)
+	if err != nil {
+		log.Println(err)
+	}
 	buf.Write(stringBytes)
-	_, err := http.Post("http://localhost:"+fmt.Sprint(port), "application/json", &buf)
+	_, err = http.Post("http://localhost:"+fmt.Sprint(port), "application/json", &buf)
 	if err != nil {
 		if isDev {
-			if ipcStructure.Type == "actorControl" {
-				log.Println(&buf)
-			}
+			log.Println(&buf)
 		} else {
 			log.Println(err)
 		}

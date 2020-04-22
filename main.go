@@ -23,8 +23,8 @@ func goLikeMain() int {
 	// MonitorType doesn't apply, nor do ProcessID or ParseAlgorithm
 	region := flag.String("-Region", "Global", "Sets the IPC version to Global/CN/KR.")
 	port := flag.Uint64("-Port", 13346, "Sets the port for the IPC connection between this application and Node.js.")
-	networkDevice := net.ParseIP(*flag.String("-LocalIP", "", "Specifies a network to capture traffic on."))
-	isDev := flag.Bool("-Dev", true, "Sets the developer mode, enabling raw data output.")
+	networkDevice := net.ParseIP(*flag.String("-LocalIP", "", "Specifies a network device by IP, to capture traffic on."))
+	isDev := flag.Bool("-Dev", true, "Enables the developer mode, enabling raw data output.")
 	flag.Parse()
 
 	port16 := uint16(*port)
