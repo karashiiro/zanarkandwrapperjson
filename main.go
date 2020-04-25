@@ -5,6 +5,7 @@ import (
 	"flag"
 	"log"
 	"net"
+	"net/http"
 	"os"
 	"regexp"
 	"strings"
@@ -12,6 +13,8 @@ import (
 
 	"github.com/ayyaruq/zanarkand"
 	"github.com/ayyaruq/zanarkand/devices"
+	"github.com/gobwas/ws"
+	"github.com/gobwas/ws/wsutil"
 	"github.com/karashiiro/ZanarkandWrapperJSON/sapphire"
 )
 
@@ -88,6 +91,28 @@ func goLikeMain() int {
 	}(sniffer)
 
 	subscriber := zanarkand.NewGameEventSubscriber()
+
+	// Initialize websocket
+	http.ListenAndServe(":"+string(*port), http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		conn, _, _, err := ws.UpgradeHTTP(r, w)
+		if err != nil {
+			log.Println(err)
+		}
+		go func() {
+			defer conn.Close()
+
+			for {
+				msg, op, err := wsutil.ReadClientData(conn)
+				if err != nil {
+					log.Println(err)
+				}
+				err = wsutil.WriteServerMessage(conn, op, msg)
+				if err != nil {
+					log.Println(err)
+				}
+			}
+		}()
+	}))
 
 	// Get resources
 	sapphire.LoadOpcodes(*region)
