@@ -30,8 +30,6 @@ func goLikeMain() int {
 	isDev := flag.Bool("-Dev", true, "Enables the developer mode, enabling raw data output.")
 	flag.Parse()
 
-	port16 := uint16(*port)
-
 	// Setup our control mechanism
 	commander := make(chan string)
 	go func(input chan string) {
@@ -92,6 +90,8 @@ func goLikeMain() int {
 
 	subscriber := zanarkand.NewGameEventSubscriber()
 
+	var conn net.Conn
+
 	// Initialize websocket
 	http.ListenAndServe(":"+string(*port), http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		conn, _, _, err := ws.UpgradeHTTP(r, w)
@@ -149,9 +149,9 @@ func goLikeMain() int {
 				log.Println("Unknown command recieved: \"", command, "\"")
 			}
 		case message := <-subscriber.IngressEvents:
-			go parseMessage(message, *region, port16, false, *isDev)
+			go parseMessage(message, *region, conn, false, *isDev)
 		case message := <-subscriber.EgressEvents:
-			go parseMessage(message, *region, port16, true, *isDev)
+			go parseMessage(message, *region, conn, true, *isDev)
 		}
 	}
 }

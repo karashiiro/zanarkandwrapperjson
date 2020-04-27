@@ -4,11 +4,12 @@ import (
 	"bytes"
 	"encoding/binary"
 	"encoding/json"
-	"fmt"
 	"log"
-	"net/http"
+	"net"
 
 	"github.com/ayyaruq/zanarkand"
+	"github.com/gobwas/ws"
+	"github.com/gobwas/ws/wsutil"
 
 	"github.com/karashiiro/ZanarkandWrapperJSON/sapphire"
 )
@@ -19,7 +20,7 @@ var actorControlTarget uint16 = sapphire.ServerZoneIpcType.ByKeys["ActorControlT
 var clientTrigger uint16 = sapphire.ClientZoneIpcType.ByKeys["ClientTrigger"]
 
 // Cast the message []byte to a packet structure and serialize the whole thing.
-func parseMessage(message *zanarkand.GameEventMessage, region string, port uint16, isDirectionEgress bool, isDev bool) {
+func parseMessage(message *zanarkand.GameEventMessage, region string, conn net.Conn, isDirectionEgress bool, isDev bool) {
 	ipcStructure := createIpcStructure(message, region, isDirectionEgress)
 
 	ipcStructure.IpcMessageFields = ipcStructure.UnmarshalType()
@@ -35,7 +36,7 @@ func parseMessage(message *zanarkand.GameEventMessage, region string, port uint1
 		ipcStructure.Body = make([]byte, 0)
 	}
 
-	ipcStructure.SerializePackout(port, isDev)
+	ipcStructure.SerializePackout(conn, isDev)
 }
 
 func createIpcStructure(message *zanarkand.GameEventMessage, region string, isDirectionEgress bool) *IpcStructure {
@@ -95,20 +96,22 @@ func (ipcStructure *IpcStructure) IdentifyClientTrigger() {
 }
 
 // SerializePackout - *Serialize* the *pack*et and send it *out* over the network.
-func (ipcStructure *IpcStructure) SerializePackout(port uint16, isDev bool) {
-	var buf bytes.Buffer
+func (ipcStructure *IpcStructure) SerializePackout(conn net.Conn, isDev bool) {
 	stringBytes, err := json.Marshal(ipcStructure)
 	if err != nil {
 		log.Println(err)
 	}
-	buf.Write(stringBytes)
-	_, err = http.Post("http://localhost:"+fmt.Sprint(port), "application/json", &buf)
-	if err != nil {
+	if conn != nil {
+		err = wsutil.WriteServerMessage(conn, ws.OpContinuation, stringBytes)
+	} else {
 		if isDev {
+			var buf bytes.Buffer
+			buf.Write(stringBytes)
 			log.Println(&buf)
-		} else {
-			log.Println(err)
 		}
+	}
+	if err != nil {
+		log.Println(err)
 	}
 }
 
