@@ -90,11 +90,11 @@ func goLikeMain() int {
 
 	subscriber := zanarkand.NewGameEventSubscriber()
 
-	var conn net.Conn
-
 	// Initialize websocket
+	var conn net.Conn
 	http.ListenAndServe(":"+string(*port), http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		conn, _, _, err := ws.UpgradeHTTP(r, w)
+		log.Println("Connection established with", conn.LocalAddr().String())
 		if err != nil {
 			log.Println(err)
 		}
@@ -102,11 +102,7 @@ func goLikeMain() int {
 			defer conn.Close()
 
 			for {
-				msg, op, err := wsutil.ReadClientData(conn)
-				if err != nil {
-					log.Println(err)
-				}
-				err = wsutil.WriteServerMessage(conn, op, msg)
+				_, _, err := wsutil.ReadClientData(conn)
 				if err != nil {
 					log.Println(err)
 				}
