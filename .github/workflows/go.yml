@@ -21,7 +21,7 @@ jobs:
           release_name: v${{ github.run_id }}
       
       - name: Make upload URL file
-        run: ${{ steps.create_release.outputs.upload_url }} > upload_url.txt
+        run: "`%q` `${{ steps.create_release.outputs.upload_url }}` > upload_url.txt"
         
       - name: Upload a Build Artifact
         uses: actions/upload-artifact@v2
