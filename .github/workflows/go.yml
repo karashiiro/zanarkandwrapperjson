@@ -43,19 +43,19 @@ jobs:
       with:
         name: upload_url
         # Destination path
-        path: upload_url.txt
+        path: upload_url/upload_url.txt
     
     - name: Set environment variable (Linux)
       if: matrix.operating-system == 'ubuntu-latest'
-      run: upload_url=`cat upload_url.txt`
+      run: upload_url=`cat upload_url/upload_url.txt`
       
     - name: Set environment variable (OS/X)
       if: matrix.operating-system == 'macos-latest'
-      run: upload_url=`cat upload_url.txt`
+      run: upload_url=`cat upload_url/upload_url.txt`
       
     - name: Set environment variable (Windows)
       if: matrix.operating-system == 'windows-latest'
-      run: setx upload_url < upload_url.txt
+      run: setx upload_url < upload_url/upload_url.txt
     
     - name: Setup system libraries
       if: matrix.operating-system == 'ubuntu-latest'
