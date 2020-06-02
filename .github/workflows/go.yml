@@ -50,31 +50,25 @@ jobs:
       if: matrix.operating-system == 'ubuntu-latest'
       uses: actions/upload-release-asset@v1.0.2
       with:
-        # The URL for uploading assets to the release
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        # The path to the asset you want to upload
         asset_path: ZanarkandWrapperJSON
-        # The name of the asset you want to upload
         asset_name: ZanarkandWrapperJSON-Linux-x64
+        asset_content_type:	application/example
         
     - name: Upload a Release Asset (OS/X)
       if: matrix.operating-system == 'macos-latest'
       uses: actions/upload-release-asset@v1.0.2
       with:
-        # The URL for uploading assets to the release
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        # The path to the asset you want to upload
         asset_path: ZanarkandWrapperJSON.app
-        # The name of the asset you want to upload
         asset_name: ZanarkandWrapperJSON-OSX-x64
+        asset_content_type: application/example
         
     - name: Upload a Release Asset (Windows)
       if: matrix.operating-system == 'windows-latest'
       uses: actions/upload-release-asset@v1.0.2
       with:
-        # The URL for uploading assets to the release
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        # The path to the asset you want to upload
         asset_path: ZanarkandWrapperJSON.exe
-        # The name of the asset you want to upload
         asset_name: ZanarkandWrapperJSON-Win-x64
+        asset_content_type: application/vnd.microsoft.portable-executable
