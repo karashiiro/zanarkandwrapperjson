@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"os"
 	"regexp"
+	"strconv"
 	"strings"
 	"time"
 
@@ -91,24 +92,28 @@ func goLikeMain() int {
 	subscriber := zanarkand.NewGameEventSubscriber()
 
 	// Initialize websocket
+	smolport := int(*port)
 	var conn net.Conn
-	http.ListenAndServe(":"+string(*port), http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		conn, _, _, err := ws.UpgradeHTTP(r, w)
-		log.Println("Connection established with", conn.LocalAddr().String())
-		if err != nil {
-			log.Println(err)
-		}
-		go func() {
-			defer conn.Close()
-
-			for {
-				_, _, err := wsutil.ReadClientData(conn)
-				if err != nil {
-					log.Println(err)
-				}
+	log.Println("Server started on port: " + strconv.Itoa(smolport))
+	go func() {
+		http.ListenAndServe(":"+strconv.Itoa(smolport), http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			conn, _, _, err := ws.UpgradeHTTP(r, w)
+			if err != nil {
+				log.Println(err)
 			}
-		}()
-	}))
+			log.Println("Connection established with", conn.LocalAddr().String())
+			go func() {
+				defer conn.Close()
+
+				for {
+					_, _, err := wsutil.ReadClientData(conn)
+					if err != nil {
+						log.Println(err)
+					}
+				}
+			}()
+		}))
+	}()
 
 	// Get resources
 	sapphire.LoadOpcodes(*region)
