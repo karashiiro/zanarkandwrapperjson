@@ -12,6 +12,10 @@ jobs:
         operating-system: [ubuntu-latest, macos-latest, windows-latest]
     runs-on: ${{ matrix.operating-system }}
     steps:
+    - name: Setup system libraries
+      if: matrix.operating-system == 'ubuntu-latest'
+      run: sudo apt update && sudo apt install -y --no-install-recommends libpcap-dev
+      
     - name: Create a Release
       if: matrix.operating-system == 'macos-latest' # Hacky but whatever
       id: create_release
@@ -23,10 +27,7 @@ jobs:
         tag_name: v${{ github.run_id }}
         # The name of the release. For example, `Release v1.0.1`
         release_name: v${{ github.run_id }}
-    - name: Setup system libraries
-      if: matrix.operating-system == 'ubuntu-latest'
-      run: sudo apt update && sudo apt install -y --no-install-recommends libpcap-dev
-      
+    
     - name: Set up Go 1.13
       uses: actions/setup-go@v1
       with:
