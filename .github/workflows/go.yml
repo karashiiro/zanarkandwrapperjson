@@ -47,15 +47,18 @@ jobs:
     
     - name: Set environment variable (Linux)
       if: matrix.operating-system == 'ubuntu-latest'
-      run: setenv upload_url `cat upload_url.txt/upload_url.txt`
+      run: export upload_url=`cat upload_url.txt/upload_url.txt`
       
     - name: Set environment variable (OS/X)
       if: matrix.operating-system == 'macos-latest'
-      run: setenv upload_url `cat upload_url.txt/upload_url.txt`
+      run: export upload_url=`cat upload_url.txt/upload_url.txt`
       
     - name: Set environment variable (Windows)
       if: matrix.operating-system == 'windows-latest'
       run: $upload_url=[IO.File]::ReadAllText("upload_url.txt/upload_url.txt")
+      
+    - name: envsubst
+      uses: foxted/github-action-envsubst@v1.0.2
     
     - name: Setup system libraries
       if: matrix.operating-system == 'ubuntu-latest'
