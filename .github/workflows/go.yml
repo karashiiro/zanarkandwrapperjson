@@ -60,7 +60,7 @@ jobs:
       uses: actions/upload-release-asset@v1.0.2
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ZanarkandWrapperJSON.app
+        asset_path: ZanarkandWrapperJSON.pkg
         asset_name: ZanarkandWrapperJSON-OSX-x64
         asset_content_type: application/example
         
