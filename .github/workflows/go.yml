@@ -35,8 +35,44 @@ jobs:
     - name: Build
       run: go build -v .
       
-    - name: Upload a Build Artifact
-      uses: actions/upload-artifact@v2
+    - name: Create a Release
+      id: create_release
+      uses: actions/create-release@v1
       with:
-        # A file, directory or wildcard pattern that describes what to upload
-        path: ZanarkandWrapperJSON.*
+        # The name of the tag. This should come from the webhook payload, `github.GITHUB_REF` when a user pushes a new tag
+        tag_name: ${{ github.GITHUB_REF }}
+        # The name of the release. For example, `Release v1.0.1`
+        release_name: ${{ github.GITHUB_REF }} # TODO change to version number
+
+    - name: Upload a Release Asset (Linux)
+      if: matrix.operating-system == 'ubuntu-latest'
+      uses: actions/upload-release-asset@v1.0.2
+      with:
+        # The URL for uploading assets to the release
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        # The path to the asset you want to upload
+        asset_path: ZanarkandWrapperJSON
+        # The name of the asset you want to upload
+        asset_name: ZanarkandWrapperJSON-Linux-x64
+        
+    - name: Upload a Release Asset (OS/X)
+      if: matrix.operating-system == 'macos-latest'
+      uses: actions/upload-release-asset@v1.0.2
+      with:
+        # The URL for uploading assets to the release
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        # The path to the asset you want to upload
+        asset_path: ZanarkandWrapperJSON.app
+        # The name of the asset you want to upload
+        asset_name: ZanarkandWrapperJSON-OSX-x64
+        
+    - name: Upload a Release Asset (Windows)
+      if: matrix.operating-system == 'windows-latest'
+      uses: actions/upload-release-asset@v1.0.2
+      with:
+        # The URL for uploading assets to the release
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        # The path to the asset you want to upload
+        asset_path: ZanarkandWrapperJSON.exe
+        # The name of the asset you want to upload
+        asset_name: ZanarkandWrapperJSON-Win-x64
