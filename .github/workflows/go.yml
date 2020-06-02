@@ -46,19 +46,21 @@ jobs:
         path: upload_url.txt
     
     - name: Set environment variable (Linux)
+      id: env_var_linux
       if: matrix.operating-system == 'ubuntu-latest'
-      run: export upload_url=`cat upload_url.txt/upload_url.txt`
+      run: echo "::set-output name=upload_url::`cat upload_url.txt/upload_url.txt`"
       
     - name: Set environment variable (OS/X)
+      id: env_var_macos
       if: matrix.operating-system == 'macos-latest'
-      run: export upload_url=`cat upload_url.txt/upload_url.txt`
+      run: echo "::set-output name=upload_url::`cat upload_url.txt/upload_url.txt`"
       
     - name: Set environment variable (Windows)
+      id: env_var_windows
       if: matrix.operating-system == 'windows-latest'
-      run: $upload_url=[IO.File]::ReadAllText("upload_url.txt/upload_url.txt")
-      
-    - name: envsubst
-      uses: foxted/github-action-envsubst@v1.0.2
+      run: |
+        $temp=[IO.File]::ReadAllText("upload_url.txt/upload_url.txt")
+        echo "::set-output name=upload_url::$temp"
     
     - name: Setup system libraries
       if: matrix.operating-system == 'ubuntu-latest'
@@ -85,7 +87,7 @@ jobs:
       env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        upload_url: ${{ env.upload_url }}
+        upload_url: ${{ steps.env_var_linux.outputs.upload_url }}
         asset_path: ZanarkandWrapperJSON
         asset_name: ZanarkandWrapperJSON-Linux-x64
         asset_content_type: application/example
@@ -96,7 +98,7 @@ jobs:
       env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        upload_url: ${{ env.upload_url }}
+        upload_url: ${{ steps.env_var_macos.outputs.upload_url }}
         asset_path: ZanarkandWrapperJSON
         asset_name: ZanarkandWrapperJSON-OSX-x64
         asset_content_type: application/example
@@ -107,7 +109,7 @@ jobs:
       env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        upload_url: ${{ env.upload_url }}
+        upload_url: ${{ steps.env_var_windows.outputs.upload_url }}
         asset_path: ZanarkandWrapperJSON.exe
         asset_name: ZanarkandWrapperJSON-Win-x64
         asset_content_type: application/vnd.microsoft.portable-executable
