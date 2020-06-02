@@ -91,22 +91,26 @@ func goLikeMain() int {
 	subscriber := zanarkand.NewGameEventSubscriber()
 
 	// Initialize websocket
-	var conn net.Conn
+	var cnctns []net.Conn
 	log.Println("Server started on port: " + *port)
 	go func() {
 		http.ListenAndServe(":"+*port, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			conn, _, _, err := ws.UpgradeHTTP(r, w)
+			curConn, _, _, err := ws.UpgradeHTTP(r, w)
+			i := len(cnctns) // Store the length of the slice, we'll use this to remove the connection by index later.
+			cnctns = append(cnctns, curConn)
 			if err != nil {
 				log.Println(err)
 			}
-			log.Println("Connection established with", conn.LocalAddr().String())
+			log.Println("Connection established with", curConn.RemoteAddr().String())
 			go func() {
-				defer conn.Close()
+				defer curConn.Close()
 
 				for {
-					_, _, err := wsutil.ReadClientData(conn)
+					_, _, err := wsutil.ReadClientData(curConn)
 					if err != nil {
 						log.Println(err)
+						cnctns = remove(cnctns, i)
+						break
 					}
 				}
 			}()
@@ -148,9 +152,14 @@ func goLikeMain() int {
 				log.Println("Unknown command recieved: \"", command, "\"")
 			}
 		case message := <-subscriber.IngressEvents:
-			go parseMessage(message, *region, conn, false, *isDev)
+			go parseMessage(message, *region, cnctns, false, *isDev)
 		case message := <-subscriber.EgressEvents:
-			go parseMessage(message, *region, conn, true, *isDev)
+			go parseMessage(message, *region, cnctns, true, *isDev)
 		}
 	}
+}
+
+func remove(s []net.Conn, i int) []net.Conn {
+	s[len(s)-1], s[i] = s[i], s[len(s)-1]
+	return s[:len(s)-1]
 }

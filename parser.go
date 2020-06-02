@@ -20,7 +20,7 @@ var actorControlTarget uint16 = sapphire.ServerZoneIpcType.ByKeys["ActorControlT
 var clientTrigger uint16 = sapphire.ClientZoneIpcType.ByKeys["ClientTrigger"]
 
 // Cast the message []byte to a packet structure and serialize the whole thing.
-func parseMessage(message *zanarkand.GameEventMessage, region string, conn net.Conn, isDirectionEgress bool, isDev bool) {
+func parseMessage(message *zanarkand.GameEventMessage, region string, cnctns []net.Conn, isDirectionEgress bool, isDev bool) {
 	ipcStructure := createIpcStructure(message, region, isDirectionEgress)
 
 	ipcStructure.IpcMessageFields = ipcStructure.UnmarshalType()
@@ -36,7 +36,7 @@ func parseMessage(message *zanarkand.GameEventMessage, region string, conn net.C
 		ipcStructure.Body = make([]byte, 0)
 	}
 
-	ipcStructure.SerializePackout(conn, isDev)
+	ipcStructure.SerializePackout(cnctns, isDev)
 }
 
 func createIpcStructure(message *zanarkand.GameEventMessage, region string, isDirectionEgress bool) *IpcStructure {
@@ -96,13 +96,17 @@ func (ipcStructure *IpcStructure) IdentifyClientTrigger() {
 }
 
 // SerializePackout - *Serialize* the *pack*et and send it *out* over the network.
-func (ipcStructure *IpcStructure) SerializePackout(conn net.Conn, isDev bool) {
+func (ipcStructure *IpcStructure) SerializePackout(cnctns []net.Conn, isDev bool) {
 	stringBytes, err := json.Marshal(ipcStructure)
 	if err != nil {
 		log.Println(err)
 	}
-	if conn != nil {
-		err = wsutil.WriteServerMessage(conn, ws.OpContinuation, stringBytes)
+	if len(cnctns) != 0 {
+		for _, conn := range cnctns {
+			if conn != nil {
+				err = wsutil.WriteServerMessage(conn, ws.OpText, stringBytes)
+			}
+		}
 	} else {
 		if isDev {
 			var buf bytes.Buffer
