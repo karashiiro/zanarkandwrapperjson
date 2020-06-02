@@ -55,7 +55,7 @@ jobs:
       
     - name: Set environment variable (Windows)
       if: matrix.operating-system == 'windows-latest'
-      run: setx upload_url | Get-Content upload_url.txt/upload_url.txt
+      run: $upload_url=[IO.File]::ReadAllText("upload_url.txt/upload_url.txt")
     
     - name: Setup system libraries
       if: matrix.operating-system == 'ubuntu-latest'
