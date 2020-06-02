@@ -47,11 +47,11 @@ jobs:
     
     - name: Set environment variable (Linux)
       if: matrix.operating-system == 'ubuntu-latest'
-      run: upload_url=`cat upload_url.txt/upload_url.txt`
+      run: export upload_url=`cat upload_url.txt/upload_url.txt`
       
     - name: Set environment variable (OS/X)
       if: matrix.operating-system == 'macos-latest'
-      run: upload_url=`cat upload_url.txt/upload_url.txt`
+      run: export upload_url=`cat upload_url.txt/upload_url.txt`
       
     - name: Set environment variable (Windows)
       if: matrix.operating-system == 'windows-latest'
