@@ -64,7 +64,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ZanarkandWrapperJSON.pkg
+        asset_path: ZanarkandWrapperJSON.app
         asset_name: ZanarkandWrapperJSON-OSX-x64
         asset_content_type: application/example
         
