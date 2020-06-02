@@ -8,7 +8,6 @@ import (
 	"net/http"
 	"os"
 	"regexp"
-	"strconv"
 	"strings"
 	"time"
 
@@ -26,7 +25,7 @@ func main() {
 func goLikeMain() int {
 	// MonitorType doesn't apply, nor do ProcessID or ParseAlgorithm
 	region := flag.String("-Region", "Global", "Sets the IPC version to Global/CN/KR.")
-	port := flag.Uint64("-Port", 13346, "Sets the port for the IPC connection between this application and Node.js.")
+	port := flag.String("-Port", "13346", "Sets the port for the IPC connection between this application and Node.js.")
 	networkDevice := net.ParseIP(*flag.String("-LocalIP", "", "Specifies a network device by IP, to capture traffic on."))
 	isDev := flag.Bool("-Dev", true, "Enables the developer mode, enabling raw data output.")
 	flag.Parse()
@@ -92,11 +91,10 @@ func goLikeMain() int {
 	subscriber := zanarkand.NewGameEventSubscriber()
 
 	// Initialize websocket
-	smolport := int(*port)
 	var conn net.Conn
-	log.Println("Server started on port: " + strconv.Itoa(smolport))
+	log.Println("Server started on port: " + *port)
 	go func() {
-		http.ListenAndServe(":"+strconv.Itoa(smolport), http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		http.ListenAndServe(":"+*port, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			conn, _, _, err := ws.UpgradeHTTP(r, w)
 			if err != nil {
 				log.Println(err)
