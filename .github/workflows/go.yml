@@ -7,7 +7,7 @@ on:
 jobs:
   build:
     name: Build
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
     steps:
     - name: Create a Release
       id: create_release
@@ -19,6 +19,9 @@ jobs:
         tag_name: v${{ github.run_id }}
         # The name of the release. For example, `Release v1.0.1`
         release_name: v${{ github.run_id }}
+        
+    - name: Setup system libraries
+      run: sudo apt update && sudo apt install -y --no-install-recommends libpcap-dev
 
     - name: Set up Go 1.13
       uses: actions/setup-go@v1
@@ -32,23 +35,10 @@ jobs:
     - name: Get dependencies
       run: |
         go install
-
-    - name: Build for Windows
-      run: go build -v .
     
     - name: Build for Linux
-      env:
-        GOOS: linux
-        GOARCH: arm
-        GOARM: 7
       run: go build -v .
     
-    - name: Build for OS/X
-      env:
-        GOOS: darwin
-        GOARCH: 386
-      run: go build -v .
-
     - name: Upload a Release Asset (Linux)
       uses: actions/upload-release-asset@v1.0.2
       env:
@@ -58,7 +48,13 @@ jobs:
         asset_path: ZanarkandWrapperJSON
         asset_name: ZanarkandWrapperJSON-v${{ github.run_id }}-Linux-x64
         asset_content_type:	application/example
-        
+    
+    - name: Build for OS/X
+      env:
+        GOOS: darwin
+        GOARCH: 386
+      run: go build -v .
+    
     - name: Upload a Release Asset (OS/X)
       uses: actions/upload-release-asset@v1.0.2
       env:
@@ -68,7 +64,13 @@ jobs:
         asset_path: ZanarkandWrapperJSON
         asset_name: ZanarkandWrapperJSON-v${{ github.run_id }}-darwin-x64
         asset_content_type: application/example
-        
+      
+    - name: Build for Windows
+      env:
+        GOOS: windows
+        GOARCH: 386
+      run: go build -v .
+
     - name: Upload a Release Asset (Windows)
       uses: actions/upload-release-asset@v1.0.2
       env:
