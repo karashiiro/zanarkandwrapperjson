@@ -83,7 +83,7 @@ jobs:
       env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        upload_url: ${{ upload_url }}
+        upload_url: ${{ env.upload_url }}
         asset_path: ZanarkandWrapperJSON
         asset_name: ZanarkandWrapperJSON-Linux-x64
         asset_content_type:	application/example
@@ -94,7 +94,7 @@ jobs:
       env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        upload_url: ${{ upload_url }}
+        upload_url: ${{ env.upload_url }}
         asset_path: ZanarkandWrapperJSON
         asset_name: ZanarkandWrapperJSON-OSX-x64
         asset_content_type: application/example
@@ -105,7 +105,7 @@ jobs:
       env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        upload_url: ${{ upload_url }}
+        upload_url: ${{ env.upload_url }}
         asset_path: ZanarkandWrapperJSON.exe
         asset_name: ZanarkandWrapperJSON-Win-x64
         asset_content_type: application/vnd.microsoft.portable-executable
