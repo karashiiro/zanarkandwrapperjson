@@ -49,6 +49,8 @@ jobs:
     - name: Upload a Release Asset (Linux)
       if: matrix.operating-system == 'ubuntu-latest'
       uses: actions/upload-release-asset@v1.0.2
+      env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
         asset_path: ZanarkandWrapperJSON
@@ -58,6 +60,8 @@ jobs:
     - name: Upload a Release Asset (OS/X)
       if: matrix.operating-system == 'macos-latest'
       uses: actions/upload-release-asset@v1.0.2
+      env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
         asset_path: ZanarkandWrapperJSON.pkg
@@ -67,6 +71,8 @@ jobs:
     - name: Upload a Release Asset (Windows)
       if: matrix.operating-system == 'windows-latest'
       uses: actions/upload-release-asset@v1.0.2
+      env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
         asset_path: ZanarkandWrapperJSON.exe
