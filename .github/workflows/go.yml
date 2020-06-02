@@ -45,18 +45,18 @@ jobs:
         # Destination path
         path: upload_url.txt
     
-    - name: Set environment variable (Linux)
-      id: env_var_linux
+    - name: Set output variable (Linux)
+      id: upload_url_linux
       if: matrix.operating-system == 'ubuntu-latest'
       run: echo "::set-output name=upload_url::`cat upload_url.txt/upload_url.txt`"
       
-    - name: Set environment variable (OS/X)
-      id: env_var_macos
+    - name: Set output variable (OS/X)
+      id: upload_url_macos
       if: matrix.operating-system == 'macos-latest'
       run: echo "::set-output name=upload_url::`cat upload_url.txt/upload_url.txt`"
       
-    - name: Set environment variable (Windows)
-      id: env_var_windows
+    - name: Set output variable (Windows)
+      id: upload_url_windows
       if: matrix.operating-system == 'windows-latest'
       run: |
         $temp=[IO.File]::ReadAllText("upload_url.txt/upload_url.txt")
@@ -76,8 +76,8 @@ jobs:
       uses: actions/checkout@v2
 
     - name: Get dependencies
-      run: |
-        go install
+      run: go install
+    
     - name: Build
       run: go build -v .
 
@@ -87,7 +87,7 @@ jobs:
       env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        upload_url: ${{ steps.env_var_linux.outputs.upload_url }}
+        upload_url: ${{ steps.upload_url_linux.outputs.upload_url }}
         asset_path: ZanarkandWrapperJSON
         asset_name: ZanarkandWrapperJSON-Linux-x64
         asset_content_type: application/example
@@ -98,7 +98,7 @@ jobs:
       env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        upload_url: ${{ steps.env_var_macos.outputs.upload_url }}
+        upload_url: ${{ steps.upload_url_macos.outputs.upload_url }}
         asset_path: ZanarkandWrapperJSON
         asset_name: ZanarkandWrapperJSON-OSX-x64
         asset_content_type: application/example
@@ -109,7 +109,7 @@ jobs:
       env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        upload_url: ${{ steps.env_var_windows.outputs.upload_url }}
+        upload_url: ${{ steps.upload_url_windows.outputs.upload_url }}
         asset_path: ZanarkandWrapperJSON.exe
         asset_name: ZanarkandWrapperJSON-Win-x64
         asset_content_type: application/vnd.microsoft.portable-executable
