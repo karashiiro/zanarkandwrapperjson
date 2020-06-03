@@ -1,0 +1,63 @@
+name: Build and Publish
+
+on: release
+
+jobs:
+  buildandpublish:
+    name: Build and Publish
+    strategy:
+      matrix:
+        operating-system: [ubuntu-latest, macos-latest, windows-latest]
+    runs-on: ${{ matrix.operating-system }}
+    steps:
+    - name: Setup system libraries
+      if: matrix.operating-system == 'ubuntu-latest'
+      run: sudo apt update && sudo apt install -y --no-install-recommends libpcap-dev
+      
+    - name: Set up Go 1.13
+      uses: actions/setup-go@v1
+      with:
+        go-version: 1.13
+      id: go
+
+    - name: Check out code into the Go module directory
+      uses: actions/checkout@v2
+
+    - name: Get dependencies
+      run: go install
+    
+    - name: Build
+      run: go build -v .
+
+    - name: Upload a Release Asset (Linux)
+      if: matrix.operating-system == 'ubuntu-latest'
+      uses: actions/upload-release-asset@v1.0.2
+      env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ github.release.upload_url }}
+        asset_path: ZanarkandWrapperJSON
+        asset_name: ZanarkandWrapperJSON-Linux-x64
+        asset_content_type: application/example
+        
+    - name: Upload a Release Asset (OS/X)
+      if: matrix.operating-system == 'macos-latest'
+      uses: actions/upload-release-asset@v1.0.2
+      env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ github.release.upload_url }}
+        asset_path: ZanarkandWrapperJSON
+        asset_name: ZanarkandWrapperJSON-OSX-x64
+        asset_content_type: application/example
+        
+    - name: Upload a Release Asset (Windows)
+      if: matrix.operating-system == 'windows-latest'
+      uses: actions/upload-release-asset@v1.0.2
+      env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ github.release.upload_url }}
+        asset_path: ZanarkandWrapperJSON.exe
+        asset_name: ZanarkandWrapperJSON-Win-x64
+        asset_content_type: application/vnd.microsoft.portable-executable
