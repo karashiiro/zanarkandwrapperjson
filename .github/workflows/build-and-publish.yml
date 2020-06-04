@@ -33,7 +33,7 @@ jobs:
       
     - name: Get Release
       id: get
-      uses: bruceadams/get-release@v1
+      uses: bruceadams/get-release@v1.2.0
 
     - name: Upload a Release Asset (Linux)
       if: matrix.operating-system == 'ubuntu-latest'
