@@ -34,14 +34,14 @@ jobs:
     - name: Get Release
       id: get
       uses: bruceadams/get-release@v1.2.0
-      with:
-        token: ${{ secrets.GITHUB_TOKEN }}
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Upload a Release Asset (Linux)
       if: matrix.operating-system == 'ubuntu-latest'
       uses: actions/upload-release-asset@v1.0.2
       env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ steps.get.outputs.upload_url }}
         asset_path: ZanarkandWrapperJSON
@@ -52,7 +52,7 @@ jobs:
       if: matrix.operating-system == 'macos-latest'
       uses: actions/upload-release-asset@v1.0.2
       env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ steps.get.outputs.upload_url }}
         asset_path: ZanarkandWrapperJSON
@@ -63,7 +63,7 @@ jobs:
       if: matrix.operating-system == 'windows-latest'
       uses: actions/upload-release-asset@v1.0.2
       env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ steps.get.outputs.upload_url }}
         asset_path: ZanarkandWrapperJSON.exe
