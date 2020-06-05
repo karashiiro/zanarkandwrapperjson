@@ -2,7 +2,7 @@ name: Build and Publish
 
 on:
   push:
-    branches: [master] # Bit jank but eh, works
+    branches: [master]
 
 jobs:
   buildandpublish:
