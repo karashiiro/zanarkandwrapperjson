@@ -2,39 +2,50 @@ package sapphire
 
 import (
 	"bytes"
+	"errors"
 	"io"
 	"io/ioutil"
+	"log"
 	"net/http"
+	"reflect"
 )
 
-// GetFile downloads a file from the specified URL and caches it, or loads the cached version. TODO make it detect changes.
+// GetFile downloads a file from the specified URL and caches it, or loads the cached version.
 func GetFile(filename string, url string) (io.Reader, error) {
-	buf, err := ioutil.ReadFile(filename)
-	if err != nil {
-		res, err := http.Get(url)
-		if err != nil {
-			return nil, err
-		}
+	fileBuf, err1 := ioutil.ReadFile(filename)
 
-		defer res.Body.Close()
-
-		// Convert the io.Reader to a bytes.Buffer, so we can then read the bytes.Buffer into the []byte we created earlier
-		intermediaryBuf := &bytes.Buffer{}
-		nRead, err := io.Copy(intermediaryBuf, res.Body)
-		if err != nil {
-			return nil, err
+	res, err2 := http.Get(url)
+	if err2 != nil {
+		log.Println("Could not access internet resource, falling back to cached resource.")
+		if err1 != nil {
+			return bytes.NewReader(fileBuf), nil
 		}
-
-		// Read the bytes.Buffer into the []byte and write out to a file
-		buf = make([]byte, nRead)
-		_, err = intermediaryBuf.Read(buf)
-		if err != nil {
-			return nil, err
-		}
-		err = ioutil.WriteFile(filename, buf, 0644)
-		if err != nil {
-			return nil, err
-		}
+		return nil, errors.New("getfile: no cached resource available")
 	}
-	return bytes.NewReader(buf), nil
+
+	defer res.Body.Close()
+
+	// Convert the io.Reader to a bytes.Buffer, so we can then read the bytes.Buffer into the []byte we created earlier
+	intermediaryBuf := &bytes.Buffer{}
+	nRead, err3 := io.Copy(intermediaryBuf, res.Body)
+	if err3 != nil {
+		return nil, err3
+	}
+	// Read the bytes.Buffer into the []byte
+	internetBuf := make([]byte, nRead)
+	_, err4 := intermediaryBuf.Read(internetBuf)
+	if err4 != nil {
+		return nil, err4
+	}
+
+	if err1 != nil || !reflect.DeepEqual(fileBuf, internetBuf) {
+		// If the file doesn't exist or the downloaded stuff is different, just write out the downloaded stuff and return
+		err5 := ioutil.WriteFile(filename, internetBuf, 0644)
+		if err5 != nil {
+			return nil, err5
+		}
+		return bytes.NewReader(internetBuf), nil
+	}
+
+	return bytes.NewReader(fileBuf), nil
 }
