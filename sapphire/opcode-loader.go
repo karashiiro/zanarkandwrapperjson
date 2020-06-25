@@ -3,7 +3,6 @@ package sapphire
 import (
 	"encoding/json"
 	"log"
-	"net/http"
 )
 
 // ServerZoneIpcType contains opcode entries for commands executing in the currently-loaded zone, from the server.
@@ -67,17 +66,13 @@ func LoadOpcodes(region string) {
 	ClientChatIpcType.ByKeys = make(map[string]uint16)
 
 	// Download opcode JSON and marshal it
-	res, err := http.Get(opcodeSource)
+	opcodeFile, err := GetFile("opcodes.json", opcodeSource)
 	if err != nil {
 		log.Fatalln(err)
 	}
-	log.Println("Opcode store downloaded. Deserializing...")
-
-	defer res.Body.Close()
 
 	var opcodes []OpcodeRegion
-
-	err = json.NewDecoder(res.Body).Decode(&opcodes)
+	err = json.NewDecoder(opcodeFile).Decode(&opcodes)
 	if err != nil {
 		log.Fatalln(err)
 	}

@@ -3,7 +3,6 @@ package sapphire
 import (
 	"encoding/json"
 	"log"
-	"net/http"
 )
 
 // DynamicConstants is a Bimap containing constants that change from patch to patch.
@@ -25,17 +24,10 @@ func LoadDynamicConstants(region string) {
 	DynamicConstants.ByKeys = make(map[string]uint32)
 
 	// Download opcode JSON and marshal it
-	res, err := http.Get(constSource)
-	if err != nil {
-		log.Fatalln(err)
-	}
-	log.Println("Constant store downloaded. Deserializing...")
-
-	defer res.Body.Close()
+	constantFile, err := GetFile("dynamic-constants.json", constSource)
 
 	var constantStore DynamicConstantsJSON
-
-	err = json.NewDecoder(res.Body).Decode(&constantStore)
+	err = json.NewDecoder(constantFile).Decode(&constantStore)
 	if err != nil {
 		log.Fatalln(err)
 	}
