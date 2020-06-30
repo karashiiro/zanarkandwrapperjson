@@ -2,6 +2,7 @@ package sapphire
 
 import (
 	"encoding/json"
+	"io"
 	"log"
 )
 
@@ -24,10 +25,27 @@ func LoadDynamicConstants(region string) {
 	DynamicConstants.ByKeys = make(map[string]uint32)
 
 	// Download opcode JSON and marshal it
-	constantFile, err := GetFile("dynamic-constants.json", constSource)
+	fileName := "dynamic-constants.json"
+	constantFile, err := GetFile(fileName, constSource)
+	if err != nil {
+		log.Fatalln(err)
+	}
 
+	go PollForUpdates(fileName, constSource)
+	go WatchFile(fileName, func(newData io.Reader) {
+		log.Println("Got new constants, reloading...")
+		unmarshalConstants(newData, region)
+		log.Println("Done!")
+	})
+
+	unmarshalConstants(constantFile, region)
+
+	log.Println("Done!")
+}
+
+func unmarshalConstants(stream io.Reader, region string) {
 	var constantStore DynamicConstantsJSON
-	err = json.NewDecoder(constantFile).Decode(&constantStore)
+	err := json.NewDecoder(stream).Decode(&constantStore)
 	if err != nil {
 		log.Fatalln(err)
 	}
@@ -42,6 +60,4 @@ func LoadDynamicConstants(region string) {
 	}
 
 	DynamicConstants.ByValues = ReverseMap32(DynamicConstants.ByKeys)
-
-	log.Println("Done!")
 }

@@ -1,14 +1,15 @@
 package sapphire
 
 import (
-	"io/ioutil"
+	"io"
 	"log"
+	"os"
 
 	"github.com/fsnotify/fsnotify"
 )
 
 // WatchFile watches the provided file path for updates, running the provided function with the updated data if an update occurs.
-func WatchFile(path string, fnUpdate func([]byte)) {
+func WatchFile(path string, fnUpdate func(io.Reader)) {
 	watcher, err := fsnotify.NewWatcher()
 	if err != nil {
 		log.Fatalln(err)
@@ -24,11 +25,11 @@ func WatchFile(path string, fnUpdate func([]byte)) {
 					return
 				}
 				if event.Op&fsnotify.Write == fsnotify.Write {
-					bytes, err := ioutil.ReadFile(path)
+					stream, err := os.Open(path)
 					if err != nil {
 						log.Fatalln(err)
 					}
-					fnUpdate(bytes)
+					fnUpdate(stream)
 				}
 			case err, ok := <-watcher.Errors:
 				if !ok {

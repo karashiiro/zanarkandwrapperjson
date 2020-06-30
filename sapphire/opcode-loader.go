@@ -2,6 +2,7 @@ package sapphire
 
 import (
 	"encoding/json"
+	"io"
 	"log"
 )
 
@@ -66,13 +67,27 @@ func LoadOpcodes(region string) {
 	ClientChatIpcType.ByKeys = make(map[string]uint16)
 
 	// Download opcode JSON and marshal it
-	opcodeFile, err := GetFile("opcodes.json", opcodeSource)
+	fileName := "opcodes.json"
+	opcodeFile, err := GetFile(fileName, opcodeSource)
 	if err != nil {
 		log.Fatalln(err)
 	}
 
+	go PollForUpdates(fileName, opcodeSource)
+	go WatchFile(fileName, func(newData io.Reader) {
+		log.Println("Got new opcodes, reloading...")
+		unmarshalOpcodes(newData, region)
+		log.Println("Done!")
+	})
+
+	unmarshalOpcodes(opcodeFile, region)
+
+	log.Println("Done!")
+}
+
+func unmarshalOpcodes(stream io.Reader, region string) {
 	var opcodes []OpcodeRegion
-	err = json.NewDecoder(opcodeFile).Decode(&opcodes)
+	err := json.NewDecoder(stream).Decode(&opcodes)
 	if err != nil {
 		log.Fatalln(err)
 	}
@@ -108,6 +123,4 @@ func LoadOpcodes(region string) {
 	ClientLobbyIpcType.ByValues = ReverseMap16(ClientLobbyIpcType.ByKeys)
 	ServerChatIpcType.ByValues = ReverseMap16(ServerChatIpcType.ByKeys)
 	ClientChatIpcType.ByValues = ReverseMap16(ClientChatIpcType.ByKeys)
-
-	log.Println("Done!")
 }
