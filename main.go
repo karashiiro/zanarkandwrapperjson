@@ -143,12 +143,13 @@ func goLikeMain() int {
 					sniffer.Stop()
 				}
 			case "update":
-				sapphire.LoadOpcodes(*region)
-				sapphire.LoadDynamicConstants(*region)
+				sapphire.LoadOpcodes(*region, *dataPath)
+				sapphire.LoadConstants(*region, *dataPath)
 			case "switchregion":
 				log.Println("Switching region to ", args[0], ".")
-				sapphire.LoadOpcodes(args[0])
-				sapphire.LoadDynamicConstants(args[0])
+				region = &args[0]
+				sapphire.LoadOpcodes(*region, *dataPath)
+				sapphire.LoadConstants(*region, *dataPath)
 			default:
 				log.Println("Unknown command recieved: \"", command, "\"")
 			}

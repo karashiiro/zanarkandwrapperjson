@@ -119,8 +119,9 @@ func (ipcStructure *IpcStructure) SerializePackout(cnctns []net.Conn, isDev bool
 	}
 }
 
-func switchRegion(region string) {
-	sapphire.LoadOpcodes(region)
+func switchRegion(region string, dataPath string) {
+	sapphire.LoadOpcodes(region, dataPath)
+	sapphire.LoadConstants(region, dataPath)
 
 	if queryActorControl, ok := sapphire.ServerZoneIpcType.ByKeys["ActorControl"]; ok {
 		actorControl = queryActorControl
