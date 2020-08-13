@@ -33,7 +33,7 @@ func (ipc *IpcStructure) MarshalJSON() ([]byte, error) {
 		SubType   string `json:"subType"`
 		SuperType string `json:"superType"`
 		Direction string `json:"direction"`
-		ServerID  uint16 `json:"serverID"`
+		ServerID  uint16 `json:"serverId"`
 		Region    string `json:"region"`
 		Timestamp int32  `json:"timestamp"`
 		Data      []int  `json:"data"`
