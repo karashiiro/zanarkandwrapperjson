@@ -21,7 +21,7 @@ type InventoryModifyHandler struct {
 func (i *InventoryModifyHandler) MarshalJSON() ([]byte, error) {
 	var actionType string
 	action := uint32(i.Action)
-	inventoryOperationID := DynamicConstants.ByKeys["InventoryOperationBaseValue"]
+	inventoryOperationID := Constants.ByKeys["InventoryOperationBaseValue"]
 	if action == inventoryOperationID {
 		actionType = "discard"
 	} else if action == inventoryOperationID+1 {
