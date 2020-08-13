@@ -61,3 +61,36 @@ func (i *InventoryModifyHandler) MarshalJSON() ([]byte, error) {
 		SplitCount:    i.SplitCount,
 	})
 }
+
+// ClientTrigger -
+type ClientTrigger struct {
+	CommandID uint16   `json:"commandId"`
+	Unk2      [2]uint8 `json:"unk_2"`
+	Param11   uint32   `json:"param11"` // Need to ask what this means; sometimes they're one uint64?
+	Param12   uint32   `json:"param12"`
+	Param2    uint32   `json:"param2"`
+	Param3    uint32   `json:"param3"` // The output names here are inconsistent with Sapphire because someone messed up Sapphire's names
+	Param4    uint32   `json:"param4"`
+	Param5    uint64   `json:"param5"`
+}
+
+// UpdatePositionHandler -
+type UpdatePositionHandler struct {
+	Rotation            float32            `json:"rotation"`
+	AnimationType       uint8              `json:"animationType"`
+	AnimationState      uint8              `json:"animationState"`
+	ClientAnimationType uint8              `json:"clientAnimationType"`
+	HeadPosition        uint8              `json:"headPosition"`
+	Position            FFXIVARR_POSITION3 `json:"position"`
+	Unk                 [4]uint8           `json:"unk"`
+}
+
+// UpdatePositionInstance -
+type UpdatePositionInstance struct {
+	Rotation            float32            `json:"rotation"`
+	InterpolateRotation float32            `json:"interpolateRotation"`
+	Flags               uint32             `json:"flags"`
+	Position            FFXIVARR_POSITION3 `json:"position"`
+	InterpolatePosition FFXIVARR_POSITION3 `json:"interpolatePosition"`
+	Unknown             uint32             `json:"unknown"`
+}

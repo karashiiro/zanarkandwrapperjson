@@ -395,6 +395,30 @@ type NpcSpawn struct {
 	Unk34           uint32             `json:"unk34"`
 }
 
+type ObjectSpawn struct {
+	SpawnIndex    uint8              `json:"spawnIndex"`
+	ObjKind       uint8              `json:"objKind"`
+	State         uint8              `json:"state"`
+	Unknown3      uint8              `json:"unknown3"`
+	ObjID         uint32             `json:"objId"`
+	ActorID       uint32             `json:"actorId"`
+	LevelID       uint32             `json:"levelId"`
+	Unknown10     uint32             `json:"unknown10"`
+	SomeActorID14 uint32             `json:"someActorId14"`
+	GimmickID     uint32             `json:"gimmickId"`
+	Scale         float32            `json:"scale"`
+	Unknown20A    int16              `json:"unknown20a"`
+	Rotation      uint16             `json:"rotation"`
+	Unknown24A    int16              `json:"unknown24a"`
+	Unknown24B    int16              `json:"unknown24b"`
+	Unknown28A    uint16             `json:"unknown28a"`
+	Unknown28C    int16              `json:"unknown28c"`
+	HousingLink   uint32             `json:"housingLink"`
+	Position      FFXIVARR_POSITION3 `json:"position"`
+	Unknown3C     int16              `json:"unknown3C"`
+	Unknown3E     int16              `json:"unknown3E"`
+}
+
 // PlayerStats - Structural representation of the packet sent by the server
 // to set a players stats
 type PlayerStats struct {
@@ -695,4 +719,17 @@ type RetainerInformation struct {
 type WeatherChange struct {
 	WeatherID uint32  `json:"weatherId"`
 	Delay     float32 `json:"delay"`
+}
+
+type PrepareZoning struct {
+	LogMessage  uint32 `json:"logMessage"`
+	TargetZone  uint16 `json:"targetZone"`
+	Animation   uint16 `json:"animation"`
+	Param4      uint8  `json:"param4"`
+	HideChar    uint8  `json:"hideChar"`
+	FadeOut     uint8  `json:"fadeOut"`
+	Param7      uint8  `json:"param7"`
+	FadeOutTime uint8  `json:"fadeOutTime"`
+	Unknown     uint8  `json:"unknown"` // this changes whether or not the destination zone's name displays during the loading screen. Seems to always be 9 (=hidden) when going to an instance and certain zones, 0 otherwise.
+	Padding     uint16 `json:"padding"`
 }
