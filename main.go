@@ -28,6 +28,7 @@ func goLikeMain() int {
 	port := flag.String("Port", "13346", "Sets the port for the IPC connection between this application and Node.js.")
 	networkDevice := net.ParseIP(*flag.String("LocalIP", "", "Specifies a network device by IP, to capture traffic on."))
 	isDev := flag.Bool("Dev", true, "Enables the developer mode, enabling raw data output.")
+	dataPath := flag.String("DataPath", "", "Sets the download path for internet resources, such as the opcode store.")
 	flag.Parse()
 
 	// Setup our control mechanism
@@ -118,8 +119,8 @@ func goLikeMain() int {
 	}()
 
 	// Get resources
-	sapphire.LoadOpcodes(*region)
-	sapphire.LoadDynamicConstants(*region)
+	sapphire.LoadOpcodes(*region, *dataPath)
+	sapphire.LoadConstants(*region, *dataPath)
 	log.Println("Initialization complete!")
 
 	// Control loop

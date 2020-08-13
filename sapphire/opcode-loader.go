@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"io"
 	"log"
+	"path"
 )
 
 // ServerZoneIpcType contains opcode entries for commands executing in the currently-loaded zone, from the server.
@@ -55,7 +56,7 @@ type OpcodeRegion struct {
 var opcodeSource = "https://raw.githubusercontent.com/karashiiro/FFXIVOpcodes/master/opcodes.min.json"
 
 // LoadOpcodes loads opcodes from the source URL.
-func LoadOpcodes(region string) {
+func LoadOpcodes(region string, dataPath string) {
 	log.Println("Downloading latest opcodes...")
 
 	// Reset maps
@@ -67,7 +68,7 @@ func LoadOpcodes(region string) {
 	ClientChatIpcType.ByKeys = make(map[string]uint16)
 
 	// Download opcode JSON and marshal it
-	fileName := "opcodes.json"
+	fileName := path.Join(dataPath, "opcodes.json")
 	opcodeFile, err := GetFile(fileName, opcodeSource)
 	if err != nil {
 		log.Fatalln(err)

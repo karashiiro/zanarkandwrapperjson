@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"io"
 	"log"
+	"path"
 )
 
 // Constants is a Bimap containing constants that change from patch to patch.
@@ -19,13 +20,13 @@ type ConstantsJSON struct {
 var constSource = "https://raw.githubusercontent.com/karashiiro/FFXIVOpcodes/master/constants.min.json"
 
 // LoadConstants loads constants from the source URL.
-func LoadConstants(region string) {
+func LoadConstants(region string, dataPath string) {
 	log.Println("Downloading constants...")
 
 	Constants.ByKeys = make(map[string]uint32)
 
 	// Download opcode JSON and marshal it
-	fileName := "constants.json"
+	fileName := path.Join(dataPath, "constants.json")
 	constantFile, err := GetFile(fileName, constSource)
 	if err != nil {
 		log.Fatalln(err)
