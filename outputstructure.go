@@ -28,25 +28,29 @@ func (ipc *IpcStructure) MarshalJSON() ([]byte, error) {
 	}
 
 	b1, err := json.Marshal(&struct {
-		Opcode    uint16 `json:"opcode"`
-		Type      string `json:"type"`
-		SubType   string `json:"subType"`
-		SuperType string `json:"superType"`
-		Direction string `json:"direction"`
-		ServerID  uint16 `json:"serverId"`
-		Region    string `json:"region"`
-		Timestamp int32  `json:"timestamp"`
-		Data      []int  `json:"data"`
+		Opcode        uint16 `json:"opcode"`
+		Type          string `json:"type"`
+		SubType       string `json:"subType"`
+		SuperType     string `json:"superType"`
+		Direction     string `json:"direction"`
+		ServerID      uint16 `json:"serverId"`
+		Region        string `json:"region"`
+		Timestamp     int32  `json:"timestamp"`
+		SourceActorID uint32 `json:"sourceActorId"`
+		TargetActorID uint32 `json:"targetActorId"`
+		Data          []int  `json:"data"`
 	}{
-		Opcode:    ipc.Opcode,
-		Type:      jsifyString(ipc.Type),
-		SubType:   jsifyString(ipc.SubType),
-		SuperType: jsifyString(ipc.SuperType),
-		Direction: ipc.Direction,
-		ServerID:  ipc.ServerID,
-		Region:    ipc.Region,
-		Timestamp: int32(ipc.Timestamp.Unix()),
-		Data:      data,
+		Opcode:        ipc.Opcode,
+		Type:          jsifyString(ipc.Type),
+		SubType:       jsifyString(ipc.SubType),
+		SuperType:     jsifyString(ipc.SuperType),
+		Direction:     ipc.Direction,
+		ServerID:      ipc.ServerID,
+		Region:        ipc.Region,
+		Timestamp:     int32(ipc.Timestamp.Unix()),
+		SourceActorID: ipc.GameEventMessage.SourceActor,
+		TargetActorID: ipc.GameEventMessage.TargetActor,
+		Data:          data,
 	})
 	if err != nil {
 		log.Println(err) // shouldn't happen but might
