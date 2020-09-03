@@ -23,7 +23,7 @@ var clientTrigger uint16 = sapphire.ClientZoneIpcType.ByKeys["ClientTrigger"]
 func parseMessage(message *zanarkand.GameEventMessage, region string, cnctns []net.Conn, isDirectionEgress bool, isDev bool) {
 	ipcStructure := createIpcStructure(message, region, isDirectionEgress)
 
-	ipcStructure.IpcMessageFields = ipcStructure.UnmarshalType()
+	//ipcStructure.IpcMessageFields = ipcStructure.UnmarshalType() // TODO: Finish this
 
 	if message.Opcode == actorControl || message.Opcode == actorControlSelf || message.Opcode == actorControlTarget {
 		ipcStructure.IdentifyActorControl()
