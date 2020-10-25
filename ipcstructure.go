@@ -1,11 +1,13 @@
 package main
 
 import (
+	"encoding/binary"
 	"encoding/json"
 	"log"
 	"strings"
 
 	"github.com/ayyaruq/zanarkand"
+	"github.com/karashiiro/ZanarkandWrapperJSON/sapphire"
 )
 
 // IpcStructure - Struct of the fields that IPC packets can have
@@ -18,6 +20,61 @@ type IpcStructure struct {
 	SuperType       string `json:"superType"`
 	Type            string `json:"type"`
 	IpcMessageFields
+}
+
+// NewIpcStructure creates a new IpcStructure.
+func NewIpcStructure(message *zanarkand.GameEventMessage, region string, isDirectionEgress bool) *IpcStructure {
+	ipcStructure := new(IpcStructure)
+	ipcStructure.GameEventMessage = *message
+	ipcStructure.Region = region
+	ipcStructure.IsEgressMessage = isDirectionEgress
+
+	ipcStructure.Type = ipcStructure.GetPacketType()
+	if isDirectionEgress {
+		ipcStructure.Direction = "send"
+	} else {
+		ipcStructure.Direction = "receive"
+	}
+
+	//ipcStructure.IpcMessageFields = ipcStructure.UnmarshalType() // TODO: Finish this
+
+	if message.Opcode == actorControl || message.Opcode == actorControlSelf || message.Opcode == actorControlTarget {
+		ipcStructure.SuperType = "ActorControl"
+		ipcStructure.SubType = sapphire.ActorControlTypeReverse[binary.LittleEndian.Uint16(ipcStructure.GameEventMessage.Body[0:2])]
+	} else if message.Opcode == clientTrigger {
+		ipcStructure.SuperType = "ClientTrigger"
+		ipcStructure.SubType = sapphire.ClientTriggerTypeReverse[binary.LittleEndian.Uint16(ipcStructure.GameEventMessage.Body[0:2])]
+	}
+
+	return ipcStructure
+}
+
+// GetPacketType gets the type of the struct correspnding to the IpcStructure's opcode.
+func (ipcStructure *IpcStructure) GetPacketType() string {
+	var ipcType string
+	var ok bool
+	if ipcStructure.IsEgressMessage {
+		ipcType, ok = sapphire.ClientZoneIpcType.ByValues[ipcStructure.Opcode]
+		if !ok {
+			ipcType, ok = sapphire.ClientLobbyIpcType.ByValues[ipcStructure.Opcode]
+		}
+		if !ok {
+			ipcType, ok = sapphire.ClientChatIpcType.ByValues[ipcStructure.Opcode]
+		}
+	} else {
+		ipcType, ok = sapphire.ServerZoneIpcType.ByValues[ipcStructure.Opcode]
+		if !ok {
+			ipcType, ok = sapphire.ServerLobbyIpcType.ByValues[ipcStructure.Opcode]
+		}
+		if !ok {
+			ipcType, ok = sapphire.ServerChatIpcType.ByValues[ipcStructure.Opcode]
+		}
+	}
+	if !ok {
+		ipcType = "unknown"
+	}
+
+	return ipcType
 }
 
 // MarshalJSON overrides all child JSON serialization methods.
@@ -33,11 +90,11 @@ func (ipc *IpcStructure) MarshalJSON() ([]byte, error) {
 		SubType       string `json:"subType"`
 		SuperType     string `json:"superType"`
 		Direction     string `json:"direction"`
-		ServerID      uint16 `json:"serverId"`
+		ServerID      uint16 `json:"serverID"`
 		Region        string `json:"region"`
 		Timestamp     int32  `json:"timestamp"`
-		SourceActorID uint32 `json:"sourceActorId"`
-		TargetActorID uint32 `json:"targetActorId"`
+		SourceActorID uint32 `json:"sourceActorSessionID"`
+		TargetActorID uint32 `json:"targetActorSessionID"`
 		Data          []int  `json:"data"`
 	}{
 		Opcode:        ipc.Opcode,

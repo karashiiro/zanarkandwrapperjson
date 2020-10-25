@@ -7,12 +7,10 @@ import (
 	"net"
 	"net/http"
 	"os"
-	"regexp"
 	"strings"
 	"time"
 
 	"github.com/ayyaruq/zanarkand"
-	"github.com/ayyaruq/zanarkand/devices"
 	"github.com/gobwas/ws"
 	"github.com/gobwas/ws/wsutil"
 	"github.com/karashiiro/ZanarkandWrapperJSON/sapphire"
@@ -31,7 +29,7 @@ func goLikeMain() int {
 	dataPath := flag.String("DataPath", "", "Sets the download path for internet resources, such as the opcode store.")
 	flag.Parse()
 
-	// Setup our control mechanism
+	// Set up our control mechanism
 	commander := make(chan string)
 	go func(input chan string) {
 		stdin := bufio.NewReader(os.Stdin)
@@ -45,37 +43,14 @@ func goLikeMain() int {
 		}
 	}(commander)
 
-	// Get the default network device
-	// Looking for ranges:
-	// 24-bit private block: 10.*.*.*
-	// 20-bit private block: 172.16.*.*-172.31.*.*
-	// 16-bit private block: 192.168.*.*
-	// 16-bit APIPA block: 169.254.*.*
-	_, subnet24, _ := net.ParseCIDR("10.0.0.0/8")
-	_, subnet20, _ := net.ParseCIDR("172.16.0.0/12")
-	_, subnet16, _ := net.ParseCIDR("192.168.0.0/16")
-	_, APIPA16, _ := net.ParseCIDR("169.254.0.0/16")
-
-	rNetIfaces, err := devices.ListDeviceNames(false, true)
+	networkInterface, err := GetNetworkInterface(networkDevice)
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalln(err)
 		return 1
 	}
-	netIfaces, _ := devices.ListDeviceNames(false, false) // It seems safe to assume that if the call that includes this and more doesn't error, this will not error if called immediately after either
-	netIfaceIdx := len(netIfaces) - 1
-	for i, nif := range rNetIfaces {
-		ip := net.ParseIP(regexp.MustCompile("\\d+\\.\\d+\\.\\d+\\.\\d+").FindString(nif)) // Lazy but it works and it only runs once
-		if networkDevice != nil && networkDevice.Equal(ip) {
-			netIfaceIdx = i
-			break
-		}
-		if subnet24.Contains(ip) || subnet20.Contains(ip) || subnet16.Contains(ip) || APIPA16.Contains(ip) {
-			netIfaceIdx = i
-		}
-	}
 
-	// Initialize a sniffer on the network device
-	sniffer, err := zanarkand.NewSniffer("pcap", netIfaces[netIfaceIdx])
+	// Initialize a sniffer on the network interface
+	sniffer, err := zanarkand.NewSniffer("pcap", networkInterface)
 	if err != nil {
 		log.Fatal(err)
 		return 1
@@ -157,9 +132,11 @@ func goLikeMain() int {
 				log.Println("Unknown command recieved: \"", command, "\"")
 			}
 		case message := <-subscriber.IngressEvents:
-			go parseMessage(message, *region, connections, false, *isDev)
+			ipcStructure := ParseMessage(message, *region, Ingress, *isDev)
+			go SerializePackout(ipcStructure, connections, *isDev)
 		case message := <-subscriber.EgressEvents:
-			go parseMessage(message, *region, connections, true, *isDev)
+			ipcStructure := ParseMessage(message, *region, Egress, *isDev)
+			go SerializePackout(ipcStructure, connections, *isDev)
 		}
 	}
 }
