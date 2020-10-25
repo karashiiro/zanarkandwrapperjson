@@ -126,8 +126,7 @@ func goLikeMain() int {
 			case "switchregion":
 				log.Println("Switching region to ", args[0], ".")
 				region = &args[0]
-				sapphire.LoadOpcodes(*region, *dataPath)
-				sapphire.LoadConstants(*region, *dataPath)
+				SwitchRegion(*region, *dataPath)
 			default:
 				log.Println("Unknown command recieved: \"", command, "\"")
 			}

@@ -60,7 +60,8 @@ func SerializePackout(ipcStructure *IpcStructure, cnctns []net.Conn, isDev bool)
 	}
 }
 
-func switchRegion(region string, dataPath string) {
+// SwitchRegion is responsible for getting region-specific opcodes after initialization.
+func SwitchRegion(region string, dataPath string) {
 	sapphire.LoadOpcodes(region, dataPath)
 	sapphire.LoadConstants(region, dataPath)
 

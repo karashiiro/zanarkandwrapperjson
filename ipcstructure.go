@@ -78,9 +78,9 @@ func (ipcStructure *IpcStructure) GetPacketType() string {
 }
 
 // MarshalJSON overrides all child JSON serialization methods.
-func (ipc *IpcStructure) MarshalJSON() ([]byte, error) {
-	data := make([]int, len(ipc.Body))
-	for i, b := range ipc.Body {
+func (ipcStructure *IpcStructure) MarshalJSON() ([]byte, error) {
+	data := make([]int, len(ipcStructure.Body))
+	for i, b := range ipcStructure.Body {
 		data[i] = int(b)
 	}
 
@@ -97,16 +97,16 @@ func (ipc *IpcStructure) MarshalJSON() ([]byte, error) {
 		TargetActorID uint32 `json:"targetActorSessionID"`
 		Data          []int  `json:"data"`
 	}{
-		Opcode:        ipc.Opcode,
-		Type:          jsifyString(ipc.Type),
-		SubType:       jsifyString(ipc.SubType),
-		SuperType:     jsifyString(ipc.SuperType),
-		Direction:     ipc.Direction,
-		ServerID:      ipc.ServerID,
-		Region:        ipc.Region,
-		Timestamp:     int32(ipc.Timestamp.Unix()),
-		SourceActorID: ipc.GameEventMessage.SourceActor,
-		TargetActorID: ipc.GameEventMessage.TargetActor,
+		Opcode:        ipcStructure.Opcode,
+		Type:          jsifyString(ipcStructure.Type),
+		SubType:       jsifyString(ipcStructure.SubType),
+		SuperType:     jsifyString(ipcStructure.SuperType),
+		Direction:     ipcStructure.Direction,
+		ServerID:      ipcStructure.ServerID,
+		Region:        ipcStructure.Region,
+		Timestamp:     int32(ipcStructure.Timestamp.Unix()),
+		SourceActorID: ipcStructure.GameEventMessage.SourceActor,
+		TargetActorID: ipcStructure.GameEventMessage.TargetActor,
 		Data:          data,
 	})
 	if err != nil {
@@ -114,7 +114,7 @@ func (ipc *IpcStructure) MarshalJSON() ([]byte, error) {
 		return nil, err
 	}
 
-	b2, err := json.Marshal(ipc.IpcMessageFields)
+	b2, err := json.Marshal(ipcStructure.IpcMessageFields)
 	if err != nil {
 		log.Println(err)
 		return nil, err
