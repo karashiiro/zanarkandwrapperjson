@@ -89,6 +89,7 @@ func (ipcStructure *IpcStructure) MarshalJSON() ([]byte, error) {
 		Type          string `json:"type"`
 		SubType       string `json:"subType"`
 		SuperType     string `json:"superType"`
+		SegmentType   uint16 `json:"segmentType"`
 		Direction     string `json:"direction"`
 		ServerID      uint16 `json:"serverID"`
 		Region        string `json:"region"`
@@ -101,6 +102,7 @@ func (ipcStructure *IpcStructure) MarshalJSON() ([]byte, error) {
 		Type:          jsifyString(ipcStructure.Type),
 		SubType:       jsifyString(ipcStructure.SubType),
 		SuperType:     jsifyString(ipcStructure.SuperType),
+		SegmentType:   ipcStructure.GameEventMessage.Segment,
 		Direction:     ipcStructure.Direction,
 		ServerID:      ipcStructure.ServerID,
 		Region:        ipcStructure.Region,
