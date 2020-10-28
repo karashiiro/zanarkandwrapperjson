@@ -2,11 +2,11 @@ package main
 
 import (
 	"encoding/binary"
-	"encoding/json"
 	"log"
 	"strings"
 
 	"github.com/ayyaruq/zanarkand"
+	jsoniter "github.com/json-iterator/go"
 	"github.com/karashiiro/ZanarkandWrapperJSON/sapphire"
 )
 
@@ -84,7 +84,7 @@ func (ipcStructure *IpcStructure) MarshalJSON() ([]byte, error) {
 		data[i] = int(b)
 	}
 
-	b1, err := json.Marshal(&struct {
+	b1, err := jsoniter.Marshal(&struct {
 		Opcode        uint16 `json:"opcode"`
 		Type          string `json:"type"`
 		SubType       string `json:"subType"`
@@ -116,7 +116,7 @@ func (ipcStructure *IpcStructure) MarshalJSON() ([]byte, error) {
 		return nil, err
 	}
 
-	b2, err := json.Marshal(ipcStructure.IpcMessageFields)
+	b2, err := jsoniter.Marshal(ipcStructure.IpcMessageFields)
 	if err != nil {
 		log.Println(err)
 		return nil, err

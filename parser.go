@@ -2,13 +2,13 @@ package main
 
 import (
 	"bytes"
-	"encoding/json"
 	"log"
 	"net"
 
 	"github.com/ayyaruq/zanarkand"
 	"github.com/gobwas/ws"
 	"github.com/gobwas/ws/wsutil"
+	jsoniter "github.com/json-iterator/go"
 
 	"github.com/karashiiro/ZanarkandWrapperJSON/sapphire"
 )
@@ -38,7 +38,7 @@ func ParseMessage(message *zanarkand.GameEventMessage, region string, packetDire
 
 // SerializePackout - *Serialize* the *pack*et and send it *out* over the network.
 func SerializePackout(ipcStructure *IpcStructure, cnctns []net.Conn, isDev bool) {
-	stringBytes, err := json.Marshal(ipcStructure)
+	stringBytes, err := jsoniter.Marshal(ipcStructure)
 	if err != nil {
 		log.Println(err)
 	}

@@ -9,6 +9,7 @@ require (
 	github.com/gobwas/pool v0.2.1 // indirect
 	github.com/gobwas/ws v1.0.3
 	github.com/google/gopacket v1.1.18 // indirect
+	github.com/json-iterator/go v1.1.10
 	golang.org/x/net v0.0.0-20200813134508-3edf25e44fcc // indirect
 	golang.org/x/sys v0.0.0-20200812155832-6a926be9bd1d // indirect
 )

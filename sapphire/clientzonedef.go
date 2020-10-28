@@ -1,6 +1,6 @@
 package sapphire
 
-import "encoding/json"
+import jsoniter "github.com/json-iterator/go"
 
 type InventoryModifyHandler struct {
 	Seq           uint32
@@ -33,7 +33,7 @@ func (i *InventoryModifyHandler) MarshalJSON() ([]byte, error) {
 	} else if action == inventoryOperationID+10 {
 		actionType = "split"
 	}
-	return json.Marshal(&struct {
+	return jsoniter.Marshal(&struct {
 		Seq           uint32    `json:"seq"`
 		Action        string    `json:"action"`
 		Pad0006       [6]uint8  `json:"pad_0006"`
