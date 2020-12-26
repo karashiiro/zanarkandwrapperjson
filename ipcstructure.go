@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"encoding/binary"
 	"log"
 	"strings"
@@ -13,27 +14,27 @@ import (
 // IpcStructure - Struct of the fields that IPC packets can have
 type IpcStructure struct {
 	zanarkand.GameEventMessage
-	Direction       string `json:"direction"`
-	IsEgressMessage bool   `json:"-"`
-	Region          string `json:"region"`
-	SubType         string `json:"subType"`
-	SuperType       string `json:"superType"`
-	Type            string `json:"type"`
+	DirectionString string           `json:"direction"`
+	Direction       MessageDirection `json:"-"`
+	Region          string           `json:"region"`
+	SubType         string           `json:"subType"`
+	SuperType       string           `json:"superType"`
+	Type            string           `json:"type"`
 	IpcMessageFields
 }
 
 // NewIpcStructure creates a new IpcStructure.
-func NewIpcStructure(message *zanarkand.GameEventMessage, region string, isDirectionEgress bool) *IpcStructure {
+func NewIpcStructure(message *zanarkand.GameEventMessage, region string, direction MessageDirection) *IpcStructure {
 	ipcStructure := new(IpcStructure)
 	ipcStructure.GameEventMessage = *message
 	ipcStructure.Region = region
-	ipcStructure.IsEgressMessage = isDirectionEgress
+	ipcStructure.Direction = direction
 
 	ipcStructure.Type = ipcStructure.GetPacketType()
-	if isDirectionEgress {
-		ipcStructure.Direction = "send"
+	if direction {
+		ipcStructure.DirectionString = "outbound"
 	} else {
-		ipcStructure.Direction = "receive"
+		ipcStructure.DirectionString = "inbound"
 	}
 
 	//ipcStructure.IpcMessageFields = ipcStructure.UnmarshalType() // TODO: Finish this
@@ -53,7 +54,7 @@ func NewIpcStructure(message *zanarkand.GameEventMessage, region string, isDirec
 func (ipcStructure *IpcStructure) GetPacketType() string {
 	var ipcType string
 	var ok bool
-	if ipcStructure.IsEgressMessage {
+	if ipcStructure.Direction {
 		ipcType, ok = sapphire.ClientZoneIpcType.ByValues[ipcStructure.Opcode]
 		if !ok {
 			ipcType, ok = sapphire.ClientLobbyIpcType.ByValues[ipcStructure.Opcode]
@@ -77,6 +78,99 @@ func (ipcStructure *IpcStructure) GetPacketType() string {
 	return ipcType
 }
 
+// UnmarshalType - Unmarshal an []byte to a packet structure
+func (ipcStructure *IpcStructure) UnmarshalType() interface{} {
+	var generic interface{}
+	if ipcStructure.Direction == Egress {
+		generic = ipcStructure.GetTypeEgress()
+	} else {
+		generic = ipcStructure.GetTypeIngress()
+	}
+
+	buf := bytes.NewReader(ipcStructure.Body)
+	if generic != new(interface{}) {
+		binary.Read(buf, binary.LittleEndian, generic)
+	}
+
+	return &generic
+}
+
+// GetTypeIngress returns an instance of the struct in the []byte of this package for inbound packets.
+func (ipcStructure *IpcStructure) GetTypeIngress() interface{} {
+	switch ipcStructure.Type {
+	// ServerZoneDef
+	case "ActorControl":
+		return new(sapphire.ActorControl)
+	case "ActorControlSelf":
+		return new(sapphire.ActorControlSelf)
+	case "CurrencyCrystalInfo":
+		return new(sapphire.CurrencyCrystalInfo)
+	case "EffectResult":
+		return new(sapphire.EffectResult)
+	case "EventFinish":
+		return new(sapphire.EventFinish)
+	case "EventPlay":
+		return new(sapphire.EventPlay)
+	case "EventPlay4":
+		return new(sapphire.EventPlay4)
+	case "EventStart":
+		return new(sapphire.EventStart)
+	case "InitZone":
+		return new(sapphire.InitZone)
+	case "InventoryTransaction":
+		return new(sapphire.InventoryTransaction)
+	case "ItemInfo":
+		return new(sapphire.ItemInfo)
+	case "MarketBoardItemListing":
+		return new(sapphire.MarketBoardItemListing)
+	case "MarketBoardItemListingCount":
+		return new(sapphire.MarketBoardItemListingCount)
+	case "MarketBoardItemListingHistory":
+		return new(sapphire.MarketBoardItemListingHistory)
+	case "MarketBoardSearchResult":
+		return new(sapphire.MarketBoardSearchResult)
+	case "MarketTaxRates":
+		return new(sapphire.MarketTaxRates)
+	case "NpcSpawn":
+		return new(sapphire.NpcSpawn)
+	case "PlayerSetup":
+		return new(sapphire.PlayerSetup)
+	case "PlayerSpawn":
+		return new(sapphire.PlayerSpawn)
+	case "PlayerStats":
+		return new(sapphire.PlayerStats)
+	case "RetainerInformation":
+		return new(sapphire.RetainerInformation)
+	case "SomeDirectorUnk4":
+		return new(sapphire.SomeDirectorUnk4)
+	case "UpdateClassInfo":
+		return new(sapphire.UpdateClassInfo)
+	case "UpdateInventorySlot":
+		return new(sapphire.UpdateInventorySlot)
+	case "WeatherChange":
+		return new(sapphire.WeatherChange)
+	// ServerLobbyDef
+	case "LobbyRetainerList":
+		return new(sapphire.LobbyRetainerList)
+	case "LobbyServiceAccountList":
+		return new(sapphire.LobbyServiceAccountList)
+	case "LobbyServerList":
+		return new(sapphire.LobbyServerList)
+	}
+
+	return new(interface{})
+}
+
+// GetTypeEgress returns an instance of the struct in the []byte of this package for outbound packets.
+func (ipcStructure *IpcStructure) GetTypeEgress() interface{} {
+	switch ipcStructure.Type {
+	case "InventoryModifyHandler":
+		return new(sapphire.InventoryModifyHandler)
+	}
+
+	return new(interface{})
+}
+
 // MarshalJSON overrides all child JSON serialization methods.
 func (ipcStructure *IpcStructure) MarshalJSON() ([]byte, error) {
 	data := make([]int, len(ipcStructure.Body))
@@ -91,11 +185,11 @@ func (ipcStructure *IpcStructure) MarshalJSON() ([]byte, error) {
 		SuperType     string `json:"superType"`
 		SegmentType   uint16 `json:"segmentType"`
 		Direction     string `json:"direction"`
-		ServerID      uint16 `json:"serverID"`
+		ServerID      uint16 `json:"serverId"`
 		Region        string `json:"region"`
 		Timestamp     int32  `json:"timestamp"`
-		SourceActorID uint32 `json:"sourceActorSessionID"`
-		TargetActorID uint32 `json:"targetActorSessionID"`
+		SourceActorID uint32 `json:"sourceActorId"`
+		TargetActorID uint32 `json:"targetActorId"`
 		Data          []int  `json:"data"`
 	}{
 		Opcode:        ipcStructure.Opcode,
@@ -103,7 +197,7 @@ func (ipcStructure *IpcStructure) MarshalJSON() ([]byte, error) {
 		SubType:       jsifyString(ipcStructure.SubType),
 		SuperType:     jsifyString(ipcStructure.SuperType),
 		SegmentType:   ipcStructure.GameEventMessage.Segment,
-		Direction:     ipcStructure.Direction,
+		Direction:     ipcStructure.DirectionString,
 		ServerID:      ipcStructure.ServerID,
 		Region:        ipcStructure.Region,
 		Timestamp:     int32(ipcStructure.Timestamp.Unix()),

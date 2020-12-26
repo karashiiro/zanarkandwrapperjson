@@ -18,15 +18,17 @@ var actorControlSelf uint16 = sapphire.ServerZoneIpcType.ByKeys["ActorControlSel
 var actorControlTarget uint16 = sapphire.ServerZoneIpcType.ByKeys["ActorControlTarget"]
 var clientTrigger uint16 = sapphire.ClientZoneIpcType.ByKeys["ClientTrigger"]
 
+// MessageDirection represents the direction a message's packet was sent in.
+type MessageDirection bool
+
+// Packet direction.
 const (
-	// Egress means outbound.
-	Egress = true
-	// Ingress means inbound.
-	Ingress = false
+	Egress  MessageDirection = true
+	Ingress MessageDirection = false
 )
 
 // ParseMessage wraps the game event message information into an IpcStructure.
-func ParseMessage(message *zanarkand.GameEventMessage, region string, packetDirection bool, isDev bool) *IpcStructure {
+func ParseMessage(message *zanarkand.GameEventMessage, region string, packetDirection MessageDirection, isDev bool) *IpcStructure {
 	ipcStructure := NewIpcStructure(message, region, packetDirection)
 
 	if !isDev {
