@@ -11,7 +11,7 @@ import (
 
 // PollForUpdates polls the provided URL for updates, and saves the updated data to the specified path if there's an update
 func PollForUpdates(path string, url string) {
-	ticker := time.NewTicker(60000 * 5)
+	ticker := time.NewTicker(time.Minute * 5)
 	defer ticker.Stop()
 
 	done := make(chan bool)
