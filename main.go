@@ -131,9 +131,11 @@ func goLikeMain() int {
 				log.Println("Unknown command recieved: \"", command, "\"")
 			}
 		case message := <-subscriber.IngressEvents:
+			log.Println("hit")
 			ipcStructure := ParseMessage(message, *region, Ingress, *isDev)
 			go SerializePackout(ipcStructure, connections, *isDev)
 		case message := <-subscriber.EgressEvents:
+			log.Println("hit")
 			ipcStructure := ParseMessage(message, *region, Egress, *isDev)
 			go SerializePackout(ipcStructure, connections, *isDev)
 		}

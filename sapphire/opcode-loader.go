@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"io"
 	"log"
+	"os"
 	"path"
 )
 
@@ -68,6 +69,10 @@ func LoadOpcodes(region string, dataPath string) {
 	ClientChatIpcType.ByKeys = make(map[string]uint16)
 
 	// Download opcode JSON and marshal it
+	if !exists(dataPath) {
+		os.MkdirAll(dataPath, 0664)
+	}
+
 	fileName := path.Join(dataPath, "opcodes.json")
 	opcodeFile, err := GetFile(fileName, opcodeSource)
 	if err != nil {
@@ -84,6 +89,14 @@ func LoadOpcodes(region string, dataPath string) {
 	unmarshalOpcodes(opcodeFile, region)
 
 	log.Println("Done!")
+}
+
+func exists(f string) bool {
+	_, err := os.Stat(f)
+	if os.IsNotExist(err) {
+		return false
+	}
+	return true
 }
 
 func unmarshalOpcodes(stream io.Reader, region string) {
