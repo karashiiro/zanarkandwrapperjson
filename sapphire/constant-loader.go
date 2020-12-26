@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"io"
 	"log"
+	"os"
 	"path"
 )
 
@@ -26,6 +27,10 @@ func LoadConstants(region string, dataPath string) {
 	Constants.ByKeys = make(map[string]uint32)
 
 	// Download opcode JSON and marshal it
+	if !exists(dataPath) {
+		os.MkdirAll(dataPath, 0664)
+	}
+
 	fileName := path.Join(dataPath, "constants.json")
 	constantFile, err := GetFile(fileName, constSource)
 	if err != nil {

@@ -91,14 +91,6 @@ func LoadOpcodes(region string, dataPath string) {
 	log.Println("Done!")
 }
 
-func exists(f string) bool {
-	_, err := os.Stat(f)
-	if os.IsNotExist(err) {
-		return false
-	}
-	return true
-}
-
 func unmarshalOpcodes(stream io.Reader, region string) {
 	var opcodes []OpcodeRegion
 	err := json.NewDecoder(stream).Decode(&opcodes)
