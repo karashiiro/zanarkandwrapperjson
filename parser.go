@@ -1,7 +1,6 @@
 package main
 
 import (
-	"bytes"
 	"log"
 	"net"
 
@@ -40,21 +39,19 @@ func ParseMessage(message *zanarkand.GameEventMessage, region string, packetDire
 
 // SerializePackout - *Serialize* the *pack*et and send it *out* over the network.
 func SerializePackout(ipcStructure *IpcStructure, cnctns []net.Conn, isDev bool) {
-	stringBytes, err := jsoniter.Marshal(ipcStructure)
+	jsonBytes, err := jsoniter.Marshal(ipcStructure)
 	if err != nil {
 		log.Println(err)
 	}
 	if len(cnctns) != 0 {
 		for _, conn := range cnctns {
 			if conn != nil {
-				err = wsutil.WriteServerMessage(conn, ws.OpText, stringBytes)
+				err = wsutil.WriteServerMessage(conn, ws.OpText, jsonBytes)
 			}
 		}
 	} else {
 		if isDev {
-			var buf bytes.Buffer
-			buf.Write(stringBytes)
-			log.Println(&buf)
+			log.Println(string(jsonBytes))
 		}
 	}
 	if err != nil {
