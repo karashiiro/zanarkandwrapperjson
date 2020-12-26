@@ -2,14 +2,13 @@ package main
 
 import (
 	"bytes"
-	"encoding/binary"
-	"encoding/json"
 	"log"
 	"net"
 
 	"github.com/ayyaruq/zanarkand"
 	"github.com/gobwas/ws"
 	"github.com/gobwas/ws/wsutil"
+	jsoniter "github.com/json-iterator/go"
 
 	"github.com/karashiiro/ZanarkandWrapperJSON/sapphire"
 )
@@ -19,85 +18,29 @@ var actorControlSelf uint16 = sapphire.ServerZoneIpcType.ByKeys["ActorControlSel
 var actorControlTarget uint16 = sapphire.ServerZoneIpcType.ByKeys["ActorControlTarget"]
 var clientTrigger uint16 = sapphire.ClientZoneIpcType.ByKeys["ClientTrigger"]
 
-// Cast the message []byte to a packet structure and serialize the whole thing.
-func parseMessage(message *zanarkand.GameEventMessage, region string, cnctns []net.Conn, isDirectionEgress bool, isDev bool) {
-	ipcStructure := createIpcStructure(message, region, isDirectionEgress)
+// MessageDirection represents the direction a message's packet was sent in.
+type MessageDirection bool
 
-	//ipcStructure.IpcMessageFields = ipcStructure.UnmarshalType() // TODO: Finish this
+// Packet direction.
+const (
+	Egress  MessageDirection = true
+	Ingress MessageDirection = false
+)
 
-	if message.Opcode == actorControl || message.Opcode == actorControlSelf || message.Opcode == actorControlTarget {
-		ipcStructure.IdentifyActorControl()
-	} else if message.Opcode == clientTrigger {
-		ipcStructure.IdentifyClientTrigger()
-	}
+// ParseMessage wraps the game event message information into an IpcStructure.
+func ParseMessage(message *zanarkand.GameEventMessage, region string, packetDirection MessageDirection, isDev bool) *IpcStructure {
+	ipcStructure := NewIpcStructure(message, region, packetDirection)
 
-	// Clear the data array for transport in production.
 	if !isDev {
-		ipcStructure.Body = make([]byte, 0)
-	}
-
-	ipcStructure.SerializePackout(cnctns, isDev)
-}
-
-func createIpcStructure(message *zanarkand.GameEventMessage, region string, isDirectionEgress bool) *IpcStructure {
-	ipcStructure := new(IpcStructure)
-	ipcStructure.GameEventMessage = *message
-	ipcStructure.Region = region
-	ipcStructure.IsEgressMessage = isDirectionEgress
-
-	ipcStructure.Type = ipcStructure.GetPacketType()
-	if isDirectionEgress {
-		ipcStructure.Direction = "outbound"
-	} else {
-		ipcStructure.Direction = "inbound"
+		ipcStructure.Body = nil
 	}
 
 	return ipcStructure
 }
 
-// GetPacketType - Gets the type of the struct correspnding to the IpcStructure's opcode.
-func (ipcStructure *IpcStructure) GetPacketType() string {
-	var ipcType string
-	var ok bool
-	if ipcStructure.IsEgressMessage {
-		ipcType, ok = sapphire.ClientZoneIpcType.ByValues[ipcStructure.Opcode]
-		if !ok {
-			ipcType, ok = sapphire.ClientLobbyIpcType.ByValues[ipcStructure.Opcode]
-		}
-		if !ok {
-			ipcType, ok = sapphire.ClientChatIpcType.ByValues[ipcStructure.Opcode]
-		}
-	} else {
-		ipcType, ok = sapphire.ServerZoneIpcType.ByValues[ipcStructure.Opcode]
-		if !ok {
-			ipcType, ok = sapphire.ServerLobbyIpcType.ByValues[ipcStructure.Opcode]
-		}
-		if !ok {
-			ipcType, ok = sapphire.ServerChatIpcType.ByValues[ipcStructure.Opcode]
-		}
-	}
-	if !ok {
-		ipcType = "unknown"
-	}
-
-	return ipcType
-}
-
-// IdentifyActorControl sets the name of the ActorControl category on the packet.
-func (ipcStructure *IpcStructure) IdentifyActorControl() {
-	ipcStructure.SuperType = "ActorControl"
-	ipcStructure.SubType = sapphire.ActorControlTypeReverse[binary.LittleEndian.Uint16(ipcStructure.GameEventMessage.Body[0:2])]
-}
-
-// IdentifyClientTrigger sets the name of the ClientTrigger category on the packet.
-func (ipcStructure *IpcStructure) IdentifyClientTrigger() {
-	ipcStructure.SuperType = "ClientTrigger"
-	ipcStructure.SubType = sapphire.ClientTriggerTypeReverse[binary.LittleEndian.Uint16(ipcStructure.GameEventMessage.Body[0:2])]
-}
-
 // SerializePackout - *Serialize* the *pack*et and send it *out* over the network.
-func (ipcStructure *IpcStructure) SerializePackout(cnctns []net.Conn, isDev bool) {
-	stringBytes, err := json.Marshal(ipcStructure)
+func SerializePackout(ipcStructure *IpcStructure, cnctns []net.Conn, isDev bool) {
+	stringBytes, err := jsoniter.Marshal(ipcStructure)
 	if err != nil {
 		log.Println(err)
 	}
@@ -119,7 +62,8 @@ func (ipcStructure *IpcStructure) SerializePackout(cnctns []net.Conn, isDev bool
 	}
 }
 
-func switchRegion(region string, dataPath string) {
+// SwitchRegion is responsible for getting region-specific opcodes after initialization.
+func SwitchRegion(region string, dataPath string) {
 	sapphire.LoadOpcodes(region, dataPath)
 	sapphire.LoadConstants(region, dataPath)
 
