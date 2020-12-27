@@ -1,5 +1,7 @@
 github.com/ayyaruq/zanarkand v0.0.0-20200611084715-3971da70ea1e h1:c5CK3C8GECbVj+sRWagmZ1KVoKVcFX6gyDEjsJvKMaQ=
 github.com/ayyaruq/zanarkand v0.0.0-20200611084715-3971da70ea1e/go.mod h1:bj2imhA+1p8lCQ4Urw2GSDz1NoQWBHMKsFui2l0FYx0=
+github.com/ayyaruq/zanarkand v0.0.0-20201227035716-b818cbd9a9dc h1:nrWV0ZclsxOVaWXXLVAd8EEe75QtxeETuhtHWFv4XWY=
+github.com/ayyaruq/zanarkand v0.0.0-20201227035716-b818cbd9a9dc/go.mod h1:bj2imhA+1p8lCQ4Urw2GSDz1NoQWBHMKsFui2l0FYx0=
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=

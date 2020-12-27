@@ -3,7 +3,7 @@ module github.com/karashiiro/ZanarkandWrapperJSON
 go 1.13
 
 require (
-	github.com/ayyaruq/zanarkand v0.0.0-20200611084715-3971da70ea1e
+	github.com/ayyaruq/zanarkand v0.0.0-20201227035716-b818cbd9a9dc
 	github.com/fsnotify/fsnotify v1.4.9
 	github.com/gobwas/httphead v0.1.0 // indirect
 	github.com/gobwas/pool v0.2.1 // indirect
